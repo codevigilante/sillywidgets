@@ -14,10 +14,11 @@ The Atypical Web App Framework, Or, The Atypical Static Site Generator
     * .silly
         * site_config.json
 	* widgets
-	* assets
-	    * css
-		* js
-		* img
+    * deploy
+	    * assets
+	        * css
+		    * js
+		    * img
     * site.json
 
 **silly build [—continuous] [-location <path/to/site/directory>]** - renders the static content  
