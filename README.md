@@ -14,22 +14,26 @@ The Atypical Web App Framework, Or, The Atypical Static Site Generator
     * .silly
         * site_config.json
 	* widgets
-    * deploy
-	    * assets
-	        * css
-		    * js
-		    * img
+    * routes
+    * assets
     * site.json
 
-**silly build [—continuous] [-location <path/to/site/directory>]** - renders the static content  
+**silly compile [-location <path/to/site/directory>]** - consumes the site.json and checks for errors  
 
-     -continuous re-renders on change  
-     -location <path/to/site/directory> renders the site located at the path    
+    -location <path/to/site/directory> compiles site.json at the location  
+
+**silly build [-location <path/to/site/directory>]** - starts a local web server and builds the html based on site.json
+
+     -location <path/to/site/directory> the root location where the server should run    
   
-**silly deploy [—minify]** - pushes the site to the server  
+**silly deploy [—minify]** - builds up all the static content for pushing to server    
 
      -minify compresses all files before deploying  
   
 # why
 
+# rules
 
+* Widgets cannot reference other widgets
+* Routes can reference widgets only
+* The directory structure of routes will be the exact same structure that's built

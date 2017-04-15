@@ -1,100 +1,218 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace silly
 {
     public class SillySite : SillyModel
     {
-        public SillyMeta Meta { get; set; }
-        public List<SillyWidget> Widgets { get; set; }
-        public List<SillyPage> Pages { get; set; }
-
-        private Dictionary<string, SillyWidget> WidgetTable = new Dictionary<string, SillyWidget>();
-        private Dictionary<string, SillyPage> PageTable = new Dictionary<string, SillyPage>();
-
-        public override bool Compile(string rootDir = "")
+        public class SiteOptions
         {
-            if (Pages == null)
-            {
-                throw new Exception("No pages found, nothing to do.");
-            }
+            public int LocalPort { get; set; }
+            public SillySitewideVariables SitewideVariables { get; set; }
+            public string DeployTo { get; set; }
+        };
+        public SiteOptions Options { get; private set; }
+        public SiteConfig Config { get; private set; }
+        public List<SillyRoute> Routes { get; set; }
+        public DirectoryInfo RootDir { get; private set; }
 
-            Console.Write("Assembling widgets...");
+        static public Dictionary<string, SillyWidget> WidgetTable = new Dictionary<string, SillyWidget>();
+        static public Dictionary<string, FileInfo> Assets = new Dictionary<string, FileInfo>();
 
-            if (Widgets != null)
+        private string SiteConfigFileName = @"/.silly/site_config.json";
+
+        public SillySite(DirectoryInfo rootDir)
+        {
+            RootDir = rootDir;
+
+            Options = new SiteOptions();
+            
+            Options.LocalPort = 8080;
+        }
+
+        public override bool Compile(SiteConfig config = null)
+        {
+            if (config == null)
             {
-                foreach (SillyWidget widget in Widgets)
+                FileInfo siteConfigJsonFilename = new FileInfo(RootDir.FullName + SiteConfigFileName);
+
+                Console.Write("Reading " + siteConfigJsonFilename.FullName + "...");
+
+                if (!siteConfigJsonFilename.Exists)
                 {
-                    if (WidgetTable.ContainsKey(widget.Name))
-                    {
-                        throw new Exception ("Duplicate widget definition: " + widget.Name + ". Widget names must be unique.");
-                    }
-
-                    widget.Compile(rootDir);
-
-                    WidgetTable.Add(widget.Name, widget);
+                    throw new Exception("Can't resolve " + siteConfigJsonFilename.FullName);
                 }
 
+                Config = JsonConvert.DeserializeObject<SiteConfig>(File.ReadAllText(siteConfigJsonFilename.FullName));
+
+                if (Config == null)
+                {
+                    throw new Exception("Problem interpreting " + siteConfigJsonFilename.FullName);
+                }
+                
                 Console.WriteLine("done");
             }
             else
             {
-                Console.WriteLine("Warning: no widgets found.");
+                Config = config;
             }
+            
+            FileInfo siteJsonFilename = new FileInfo(RootDir.FullName + "/" + Config.EntryPoint);
 
-            Console.Write("Organizing routes...");
+            Console.Write("Reading " + siteJsonFilename.FullName + "...");
 
-            foreach (SillyPage page in Pages)
+            Options = JsonConvert.DeserializeObject<SiteOptions>(File.ReadAllText(siteJsonFilename.FullName));
+
+            if (Options == null)
             {
-                page.Compile();
-
-                if (PageTable.ContainsKey(page.Route))
-                {
-                    throw new Exception("Duplicate route detected: " + page.Route + ". Routes must be unique.");
-                }               
-
-                if (page.Widgets != null)
-                {
-                    foreach(string widgetKey in page.Widgets)
-                    {
-                        if (!WidgetTable.ContainsKey(widgetKey))
-                        {
-                            throw new Exception("Cannot resolve widget name '" + widgetKey + "'");
-                        }
-                    }
-                }
-
-                PageTable.Add(page.Route, page);
+                throw new Exception("Problem interpreting " + siteJsonFilename.FullName);
             }
 
             Console.WriteLine("done");
 
-            Console.Write("Analyzing meta...");
+            Console.WriteLine("Compiling...");
 
-            if (Meta != null)
+            DirectoryInfo assetsDir = CheckDirectory(Config.Assets);
+
+            if (assetsDir != null)
             {
-                Meta.Compile(rootDir);
+                BuildAssets(assetsDir, Config.Assets);
+            }
+            else
+            {
+                Console.WriteLine("No assets found");
             }
 
-            Console.WriteLine("done");
+            DirectoryInfo widgetsDir = CheckDirectory(Config.Widgets);
+
+            if (widgetsDir != null)
+            {
+                BuildWidgetTable(widgetsDir);
+            }
+            else
+            {
+                Console.WriteLine("No widgets to compile");
+            }            
+
+            DirectoryInfo routesDir = CheckDirectory(Config.Routes);
+
+            if (routesDir != null)
+            {
+                BuildRoutes(routesDir);
+            }
+            else
+            {
+                Console.WriteLine("No routes defined");
+            }
 
             return (true);
         }
 
-        public bool Deploy()
+        private DirectoryInfo CheckDirectory(string targetDir)
         {
-            
-            // clean the deploy directory, excluding 'assets'
-            // output html
+            DirectoryInfo dir = new DirectoryInfo(RootDir.FullName + "/" + targetDir);
 
-            foreach(SillyPage page in PageTable.Values)
+            Console.Write("Checking directory '" + targetDir + "'...");
+
+            if (dir.Exists)
             {
-                // make the route in the 'deploy' directory
-                // build the page
+                Console.WriteLine("done");
+
+                return (dir);
+            }
+        
+            Console.WriteLine("Directory not found. Expected it here: " + dir.FullName);
+            
+            return(null);
+        }
+
+        private void BuildAssets(DirectoryInfo dir, string currentPath = "")
+        {
+            string pathSuffix = String.IsNullOrEmpty(currentPath) ? "" : "/";
+
+            foreach(FileInfo file in dir.GetFiles())
+            {
+                string id = currentPath + pathSuffix + file.Name;
+
+                Console.Write("Assimilating " + id + "...");
+
+                Assets.Add(id, file);
+
+                Console.WriteLine("done");
             }
 
-            
+            foreach(DirectoryInfo subDir in dir.GetDirectories())
+            {
+                BuildAssets(subDir, currentPath + pathSuffix + subDir.Name);
+            }
+        }
+
+        private void BuildRoutes(DirectoryInfo routesDir, string currentPath = "")
+        {
+            Routes = new List<SillyRoute>();
+
+            string pathSuffix = String.IsNullOrEmpty(currentPath) ? "" : "/";
+
+            foreach(FileInfo routeFile in routesDir.GetFiles())
+            {
+                if (String.Compare(routeFile.Extension, ".html", true) == 0)
+                {
+                    SillyRoute route = new SillyRoute(routeFile, currentPath + pathSuffix);
+
+                    Console.Write("Compiling " + route.ID + "...");
+
+                    route.Compile(Config);
+
+                    Routes.Add(route);
+
+                    Console.WriteLine("done");
+                }
+                else
+                {
+                    Console.WriteLine("Skipping non-route file " + routeFile.Name);
+                }
+            }
+
+            foreach(DirectoryInfo routeSubDir in routesDir.GetDirectories())
+            {
+                BuildRoutes(routeSubDir, currentPath + pathSuffix + routeSubDir.Name);
+            }
+        }
+
+        private void BuildWidgetTable(DirectoryInfo widgetsDir, string currentPath = "")
+        {
+            string pathSuffix = String.IsNullOrEmpty(currentPath) ? "" : "/";
+
+            foreach(FileInfo widgetFile in widgetsDir.GetFiles())
+            {
+                if (String.Compare(widgetFile.Extension, ".html", true) == 0)
+                {
+                    SillyWidget widget = new SillyWidget(widgetFile, currentPath + pathSuffix);
+
+                    Console.Write("Compiling " + widget.ID + "...");
+
+                    widget.Compile(Config);
+
+                    SillySite.WidgetTable.Add(widget.ID, widget);
+
+                    Console.WriteLine("done");
+                }
+                else
+                {
+                    Console.WriteLine("Skipping non-widget file " + widgetFile.Name);
+                }
+            }
+
+            foreach(DirectoryInfo widgetSubDir in widgetsDir.GetDirectories())
+            {
+                BuildWidgetTable(widgetSubDir, currentPath + pathSuffix + widgetSubDir.Name);
+            }
+        }
+
+        public bool Deploy(string targetDir)
+        {            
             return(true);
         }
     }

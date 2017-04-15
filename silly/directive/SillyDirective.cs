@@ -5,11 +5,19 @@ namespace silly
 {
     public abstract class SillyDirective
     {
+        public static class Directives
+        {
+            public static string New = "new";
+            public static string Compile = "compile";
+            public static string Build = "build";
+        }
+
         private static Dictionary<string, SillyDirective> SupportedDirectives = new Dictionary<string, SillyDirective>()
         {
-            { "new", new NewDirective("new") },
-            { "build", new BuildDirective("build") }
-            // "dev"
+            { Directives.New, new NewDirective(Directives.New) },
+            { Directives.Compile, new CompileDirective(Directives.Compile) },
+            { Directives.Build, new BuildDirective(Directives.Build) }
+            // { "deploy", new DeployDirective("deploy") }
         };
         public string Command { get; private set; }
         public string Description { get; private set; }
@@ -55,6 +63,11 @@ namespace silly
         public static Dictionary<string, SillyDirective>.ValueCollection KnownDirectives()
         {
             return (SupportedDirectives.Values);
+        }
+
+        public static Dictionary<String, SillyDirective>.KeyCollection KnowDirectiveNames()
+        {
+            return(SupportedDirectives.Keys);
         }
     }
 }

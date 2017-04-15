@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace silly
 {
@@ -9,6 +10,6 @@ namespace silly
 
         }
 
-        public abstract bool Compile(string rootDir = "");
+        public abstract bool Compile(SiteConfig siteConfig = null);
     }
 }

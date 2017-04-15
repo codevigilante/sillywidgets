@@ -29,6 +29,8 @@ namespace silly
             try
             {
                 command.Execute(args);
+
+                Console.WriteLine(command.Command + " successful");
             }
             catch (Exception ex)
             {
@@ -36,8 +38,6 @@ namespace silly
 
                 return ((int)Globals.ExitReasons.DirectiveFail);
             }
-
-            Console.WriteLine("Done.");
 
             return((int)Globals.ExitReasons.OK);
         }
@@ -50,7 +50,16 @@ namespace silly
 
         private static void OutputDirectives()
         {
-            Console.WriteLine("Usage:");
+            string usageString = "Usage: silly [";
+
+            foreach(string directive in SillyDirective.KnowDirectiveNames())
+            {
+                usageString += " " + directive;
+            }
+
+            usageString += " ] [ options ]";
+
+            Console.WriteLine(usageString);
             Console.WriteLine();
 
             foreach(SillyDirective directive in SillyDirective.KnownDirectives())
@@ -62,7 +71,7 @@ namespace silly
                     options += "[" + option.Key + "]" + " ";
                 }
 
-                Console.WriteLine("silly " + directive.Command + " " + options + " - " + directive.Description);
+                Console.WriteLine(directive.Command + " " + options + " - " + directive.Description);
             }
         }
 
