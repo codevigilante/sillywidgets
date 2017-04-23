@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using HtmlAgilityPack;
 
 namespace silly
@@ -7,6 +8,9 @@ namespace silly
     public class SillyRoute : SillyWidget
     {
         public Object Variables { get; set; }
+
+        private List<HtmlNode> Widgets = new List<HtmlNode>();
+
 
         public SillyRoute(FileInfo widgetFile, string prefix = "")
             : base(widgetFile, prefix)
@@ -17,6 +21,13 @@ namespace silly
         {
             base.LoadHtml();
 
+            string routesDir = "routes";
+
+            if (config != null)
+            {
+                routesDir = config.Routes;
+            }
+
             HtmlNode root = Html.DocumentNode;
 
             HtmlNodeCollection widgetNodes = root.SelectNodes("//*[@silly-widget]");
@@ -25,6 +36,14 @@ namespace silly
             {
                 return(true);
             }
+
+            DirectoryInfo sourceRoot = Source.Directory;
+
+            while(sourceRoot != null &&
+                  String.Compare(sourceRoot.Name, routesDir, true) != 0)
+            {
+                sourceRoot = sourceRoot.Parent;
+            }          
             
             foreach(HtmlNode widgetNode in widgetNodes)
             {
@@ -34,6 +53,8 @@ namespace silly
                 {
                     throw new Exception("Cannot resolve widget '" + widgetName + "'");
                 }
+
+                Widgets.Add(widgetNode);
             }
 
             HtmlNodeCollection css = root.SelectNodes("//link[@rel]");
@@ -51,7 +72,9 @@ namespace silly
                             continue;
                         }
 
-                        if (!SillySite.Assets.ContainsKey(attrVal))
+                        FileInfo cssFile = new FileInfo(sourceRoot.FullName + "/" + attrVal);
+
+                        if (!cssFile.Exists)
                         {
                             throw new Exception("Cannot resolve CSS reference '" + attrVal + "'");
                         }
@@ -72,7 +95,9 @@ namespace silly
                         continue;
                     }
 
-                    if (!SillySite.Assets.ContainsKey(attrVal))
+                    FileInfo jsFile = new FileInfo(sourceRoot.FullName + "/" + attrVal);
+
+                    if (!jsFile.Exists)
                     {
                         throw new Exception("Cannot resolve javascript reference '" + attrVal + "'");
                     }
@@ -80,6 +105,47 @@ namespace silly
             }
 
             return(true);
+        }
+
+        public string Resolve()
+        {
+            string payload = string.Empty;
+            base.LoadHtml();
+
+            HtmlNode root = Html.DocumentNode;
+
+            HtmlNodeCollection widgetNodes = root.SelectNodes("//*[@silly-widget]");
+
+            if (widgetNodes == null)
+            {
+                return(Html.DocumentNode.OuterHtml);
+            }
+            
+            foreach(HtmlNode widgetNode in widgetNodes)
+            {
+                string widgetName = widgetNode.Attributes["silly-widget"].Value;
+                FileInfo widgetFile = SillySite.WidgetFileFromName(widgetName);
+
+                if (widgetFile != null)
+                {
+                    SillyWidget widget = new SillyWidget(widgetFile);
+                    HtmlNode widgetRoot = widget.GetRoot();
+
+                    if (widgetRoot != null)
+                    {
+                        widgetNode.RemoveAllChildren();
+                        widgetNode.AppendChild(widgetRoot);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Cannot resolve widget '" + widgetName + "'");
+                }
+            }
+
+            payload = Html.DocumentNode.OuterHtml;
+
+            return(payload);
         }
     }
 }

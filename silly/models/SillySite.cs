@@ -15,24 +15,22 @@ namespace silly
         };
         public SiteOptions Options { get; private set; }
         public SiteConfig Config { get; private set; }
-        public List<SillyRoute> Routes { get; set; }
+        public Dictionary<string, SillyRoute> Routes { get; set; }
         public DirectoryInfo RootDir { get; private set; }
 
         static public Dictionary<string, SillyWidget> WidgetTable = new Dictionary<string, SillyWidget>();
-        static public Dictionary<string, FileInfo> Assets = new Dictionary<string, FileInfo>();
 
         private string SiteConfigFileName = @"/.silly/site_config.json";
 
         public SillySite(DirectoryInfo rootDir)
         {
             RootDir = rootDir;
-
-            Options = new SiteOptions();
-            
+            Routes = new Dictionary<string, SillyRoute>();
+            Options = new SiteOptions();            
             Options.LocalPort = 8080;
         }
 
-        public override bool Compile(SiteConfig config = null)
+        public bool Setup(SiteConfig config = null)
         {
             if (config == null)
             {
@@ -58,7 +56,7 @@ namespace silly
             {
                 Config = config;
             }
-            
+
             FileInfo siteJsonFilename = new FileInfo(RootDir.FullName + "/" + Config.EntryPoint);
 
             Console.Write("Reading " + siteJsonFilename.FullName + "...");
@@ -72,19 +70,6 @@ namespace silly
 
             Console.WriteLine("done");
 
-            Console.WriteLine("Compiling...");
-
-            DirectoryInfo assetsDir = CheckDirectory(Config.Assets);
-
-            if (assetsDir != null)
-            {
-                BuildAssets(assetsDir, Config.Assets);
-            }
-            else
-            {
-                Console.WriteLine("No assets found");
-            }
-
             DirectoryInfo widgetsDir = CheckDirectory(Config.Widgets);
 
             if (widgetsDir != null)
@@ -93,14 +78,23 @@ namespace silly
             }
             else
             {
-                Console.WriteLine("No widgets to compile");
-            }            
+                Console.WriteLine("No widgets found");
+            } 
+
+            return(true);
+        }
+
+        public override bool Compile(SiteConfig config = null)
+        {
+            Console.WriteLine("Compiling...");          
+
+            Setup(config);
 
             DirectoryInfo routesDir = CheckDirectory(Config.Routes);
 
             if (routesDir != null)
             {
-                BuildRoutes(routesDir);
+                BuildRoutes(routesDir, "/");
             }
             else
             {
@@ -108,6 +102,20 @@ namespace silly
             }
 
             return (true);
+        }
+
+        static public FileInfo WidgetFileFromName(string widgetName)
+        {
+            SillyWidget widget = null;
+
+            WidgetTable.TryGetValue(widgetName, out widget);
+
+            if (widget != null)
+            {
+                return(widget.Source);
+            }
+
+            return(null);
         }
 
         private DirectoryInfo CheckDirectory(string targetDir)
@@ -128,32 +136,14 @@ namespace silly
             return(null);
         }
 
-        private void BuildAssets(DirectoryInfo dir, string currentPath = "")
-        {
-            string pathSuffix = String.IsNullOrEmpty(currentPath) ? "" : "/";
-
-            foreach(FileInfo file in dir.GetFiles())
-            {
-                string id = currentPath + pathSuffix + file.Name;
-
-                Console.Write("Assimilating " + id + "...");
-
-                Assets.Add(id, file);
-
-                Console.WriteLine("done");
-            }
-
-            foreach(DirectoryInfo subDir in dir.GetDirectories())
-            {
-                BuildAssets(subDir, currentPath + pathSuffix + subDir.Name);
-            }
-        }
-
         private void BuildRoutes(DirectoryInfo routesDir, string currentPath = "")
         {
-            Routes = new List<SillyRoute>();
+            string pathSuffix = string.Empty;
 
-            string pathSuffix = String.IsNullOrEmpty(currentPath) ? "" : "/";
+            if (!String.IsNullOrEmpty(currentPath) && String.Compare(currentPath, "/", true) != 0)
+            {
+                pathSuffix = "/";
+            }
 
             foreach(FileInfo routeFile in routesDir.GetFiles())
             {
@@ -165,7 +155,7 @@ namespace silly
 
                     route.Compile(Config);
 
-                    Routes.Add(route);
+                    Routes.Add(route.ID, route);
 
                     Console.WriteLine("done");
                 }

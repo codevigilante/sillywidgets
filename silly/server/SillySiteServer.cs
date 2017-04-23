@@ -71,37 +71,61 @@ namespace silly
 
                         SillyHttpRequestParser request = new SillyHttpRequestParser(buffer);
 
+                        if (request.Ignore)
+                        {
+                            consoleStr += "-> Empty request received, ignoring";
+
+                            continue;
+                        }
+
                         if (request.IsInvalid)
                         {
-                            Console.WriteLine(request.InvalidReason);
+                            consoleStr += "-> " + request.InvalidReason + " ";
 
                             continue;
                         }
 
                         consoleStr += request.Method + " " + request.URL + " " + request.Version + " ";
 
-                        string dir = WebRoot.FullName + request.URL;
-                        
-                        if(!request.RequestIsFile)
+                        string normalizedRequest = WebRoot.FullName + request.URL.Trim().ToLower();
+
+                        if (Directory.Exists(normalizedRequest))
                         {
-                            dir += "index.html";
+                            normalizedRequest += "/index.html";
                         }
 
-                        FileInfo requestPayload = new FileInfo(dir);
+                        FileInfo requestedFile = new FileInfo(normalizedRequest);
 
-                        if (!requestPayload.Exists)
+                        if (requestedFile.Exists)
+                        {
+                            if (String.Compare(requestedFile.Extension, ".html", true) == 0)
+                            {
+                                SillyRoute route = new SillyRoute(requestedFile);
+
+                                response.Payload = route.Resolve();
+                            }
+                            else
+                            {
+                                SillyResource resource = new SillyResource(requestedFile);
+
+                                // this won't work for images, Payload needs to be a byte[]
+                                response.Payload = ASCIIEncoding.ASCII.GetString(resource.Contents());
+                            }
+
+                            consoleStr += "-> RESOURCE " + request.URL + " RESOLVED ";
+                        }
+                        else
                         {
                             response.Code = SillyHttpResponse.ResponseCodes.NotFound;
                             response.Payload = Error404;
 
-                            throw new Exception("Requested resource " + request.URL + " does not exist");
+                            throw new Exception(" RESOURCE " + request.URL + " DOES NOT EXIST ");
                         }
-
-                        consoleStr += "-> Resolved: " + requestPayload.FullName + " ";
                     }
                 }
                 catch(Exception ex)
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     consoleStr += "-> Exception: " + ex.Message + " ";
                 }
                 finally
@@ -111,6 +135,7 @@ namespace silly
                     consoleStr += response.Code;
 
                     Console.WriteLine(consoleStr);
+                    Console.ResetColor();
 
                     if (socket != null && socket.Connected)
                     {

@@ -33,7 +33,7 @@ namespace silly
 
             SillySite site = new SillySite(DefaultLocation);
 
-            site.Compile();
+            site.Setup();
 
             SillySiteServer buildServer = new SillySiteServer(site);
 

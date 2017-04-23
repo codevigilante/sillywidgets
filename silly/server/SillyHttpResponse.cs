@@ -6,7 +6,7 @@ namespace silly
 {
     public class SillyHttpResponse
     {
-        public enum MimeType { TextHtml }
+        public enum MimeType { TextHtml, TextCss, ApplicationJavascript }
         public enum ResponseCodes { OK, NotFound, ServerError }
         public MimeType Mime { get; set; }
         public ResponseCodes Code { get; set; }
@@ -73,6 +73,10 @@ namespace silly
         {
             switch(Mime)
             {
+                case MimeType.TextCss:
+                    return("text/css");
+                case MimeType.ApplicationJavascript:
+                    return("application/javascript");
                 case MimeType.TextHtml:
                 default:
                     return("text/html");

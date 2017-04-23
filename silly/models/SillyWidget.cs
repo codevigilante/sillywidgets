@@ -7,18 +7,9 @@ namespace silly
     public class SillyWidget : SillyModel
     {
         public string ID { get; set; }
-        public string Source { get; set; }
+        public FileInfo Source { get; set; }
 
         protected HtmlDocument Html = new HtmlDocument();
-        
-        public SillyWidget(string id, string htmlFilename)
-            : base()
-        {
-            this.ID = id;
-            this.Source = htmlFilename;
-
-            Html.OptionCheckSyntax = true;
-        }
 
         public SillyWidget(FileInfo widgetFile, string prefix = "")
         {
@@ -28,13 +19,13 @@ namespace silly
             }
 
             ID = prefix + Path.GetFileNameWithoutExtension(widgetFile.Name);
-            Source = widgetFile.FullName;
+            Source = widgetFile;
+
+            LoadHtml();
         }
 
         public override bool Compile(SiteConfig config = null)
         {
-            LoadHtml();
-
             HtmlNode root = Html.DocumentNode;
 
             HtmlNodeCollection widgetNodes = root.SelectNodes("//*[@silly-widget]");
@@ -45,13 +36,18 @@ namespace silly
             }
             else
             {
-                throw new Exception("Widget '" + Source + "' references other widgets, which is a no no");
+                throw new Exception("Widget '" + Source.FullName + "' references other widgets, which is a no no");
             }
+        }
+
+        public HtmlNode GetRoot()
+        {
+            return(Html.DocumentNode);
         }
 
         protected void LoadHtml()
         {
-            using (FileStream fs = new FileStream(Source, FileMode.Open))
+            using (FileStream fs = new FileStream(Source.FullName, FileMode.Open))
             {
                 Html.Load(fs);
 

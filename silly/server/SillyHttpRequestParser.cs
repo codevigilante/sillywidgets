@@ -14,6 +14,7 @@ namespace silly
         public bool IsInvalid { get; private set; }
         public string InvalidReason { get; private set; }
         public bool RequestIsFile { get; private set; }
+        public bool Ignore { get; private set; }
 
         private string[] RequestLines = null;
         private Dictionary<string, Methods> SupportedMethods = new Dictionary<string, Methods>()
@@ -37,6 +38,14 @@ namespace silly
 
         public SillyHttpRequestParser(string request)
         {
+            if (String.IsNullOrEmpty(request) || String.IsNullOrWhiteSpace(request))
+            {
+                Ignore = true;
+
+                return;
+            }
+
+            Ignore = false;
             IsInvalid = false;
             RequestIsFile = false;
             RequestLines = request.Split(new char[] { '\n', '\r' }, 2, StringSplitOptions.RemoveEmptyEntries);
@@ -45,6 +54,10 @@ namespace silly
             {
                 ParseRequest();   
                 ParseHeader();
+            }
+            else if (RequestLines.Length == 0)
+            {
+                Ignore = true;
             }
             else
             {
