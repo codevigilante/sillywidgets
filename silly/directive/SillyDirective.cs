@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 
 namespace silly
@@ -10,15 +11,17 @@ namespace silly
             public static string New = "new";
             public static string Compile = "compile";
             public static string Build = "build";
+            public static string Deploy = "deploy";
         }
 
         private static Dictionary<string, SillyDirective> SupportedDirectives = new Dictionary<string, SillyDirective>()
         {
             { Directives.New, new NewDirective(Directives.New) },
             { Directives.Compile, new CompileDirective(Directives.Compile) },
-            { Directives.Build, new BuildDirective(Directives.Build) }
-            // { "deploy", new DeployDirective("deploy") }
+            { Directives.Build, new BuildDirective(Directives.Build) },
+            { Directives.Deploy, new DeployDirective(Directives.Deploy) }
         };
+
         public string Command { get; private set; }
         public string Description { get; private set; }
         public Dictionary<string, DirectiveOption> Options { get; private set; }

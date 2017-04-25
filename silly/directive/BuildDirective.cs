@@ -7,7 +7,6 @@ namespace silly
 {
     public class BuildDirective : SillyDirective
     {
-        private enum BuildOptions { Continuous, Location, Unknown }
         public DirectoryInfo DefaultLocation { get; private set; }
 
         public BuildDirective(string id) : base(id, "renders the static content")

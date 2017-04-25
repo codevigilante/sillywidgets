@@ -12,6 +12,7 @@ namespace silly
         public ResponseCodes Code { get; set; }
         public string Version { get; set; }
         public string Payload { get; set; }
+
         public SillyHttpResponse(MimeType mime, ResponseCodes code, string payload)
         {
             Mime = mime;
@@ -19,7 +20,7 @@ namespace silly
             Code = code;
             Payload = payload;
         }
-
+        
         private void Send(Socket socket, Byte[] data)
         {
             if (socket == null || !socket.Connected)
