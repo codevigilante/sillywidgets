@@ -12,24 +12,15 @@ namespace silly
         private List<HtmlNode> Widgets = new List<HtmlNode>();
 
 
-        public SillyRoute(FileInfo widgetFile, string prefix = "")
-            : base(widgetFile, prefix)
+        public SillyRoute(FileInfo widgetFile, DirectoryInfo root, string prefix = "")
+            : base(widgetFile, root, prefix)
         {
         }
 
-        public override bool Compile(SiteConfig config = null)
+        public override bool Compile()
         {
             base.LoadHtml();
-
-            string routesDir = "routes";
-
-            if (config != null)
-            {
-                routesDir = config.Routes;
-            }
-
             HtmlNode root = Html.DocumentNode;
-
             HtmlNodeCollection widgetNodes = root.SelectNodes("//*[@silly-widget]");
 
             if (widgetNodes == null)
@@ -37,13 +28,10 @@ namespace silly
                 return(true);
             }
 
-            DirectoryInfo sourceRoot = Source.Directory;
-
-            while(sourceRoot != null &&
-                  String.Compare(sourceRoot.Name, routesDir, true) != 0)
+            if (base.RootDir == null)
             {
-                sourceRoot = sourceRoot.Parent;
-            }          
+                throw new Exception("Cannot establish root directory");
+            }
             
             foreach(HtmlNode widgetNode in widgetNodes)
             {
@@ -72,7 +60,7 @@ namespace silly
                             continue;
                         }
 
-                        FileInfo cssFile = new FileInfo(sourceRoot.FullName + "/" + attrVal);
+                        FileInfo cssFile = new FileInfo(base.RootDir.FullName + "/" + attrVal);
 
                         if (!cssFile.Exists)
                         {
@@ -95,7 +83,7 @@ namespace silly
                         continue;
                     }
 
-                    FileInfo jsFile = new FileInfo(sourceRoot.FullName + "/" + attrVal);
+                    FileInfo jsFile = new FileInfo(base.RootDir.FullName + "/" + attrVal);
 
                     if (!jsFile.Exists)
                     {
@@ -128,7 +116,7 @@ namespace silly
 
                 if (widgetFile != null)
                 {
-                    SillyWidget widget = new SillyWidget(widgetFile);
+                    SillyWidget widget = new SillyWidget(widgetFile, base.RootDir);
                     HtmlNode widgetRoot = widget.GetRoot();
 
                     if (widgetRoot != null)

@@ -15,27 +15,76 @@ namespace silly
                 return ((int)Globals.ExitReasons.About);
             }
 
-            SillyDirective command = SillyDirective.CreateDirective(args[0].ToLower());
+            SillyDirective directive = SillyDirective.CreateDirective(args[0]);
 
-            if (command == null)
+            if (directive == null)
             {
-                Console.WriteLine("Unknown directive: " + args[0]);
-
+                CLIError(args[0], "unknown directive");
                 OutputDirectives();
 
                 return ((int)Globals.ExitReasons.UnknownDirective);
             }
 
+            SillyOption option = null;
+
+            for(UInt16 i = 1; i < args.Length; ++i)
+            {
+                string arg = args[i];
+
+                CLIToken token = CLIToken.CreateToken(arg);
+
+                if (token.Type == CLIToken.TokenTypes.Directive)
+                {
+                    CLIError(arg, "cannot execute multiple directives in same command");
+
+                    return ((int)Globals.ExitReasons.DirectiveFail);
+                }
+                else if (token.Type == CLIToken.TokenTypes.Option)
+                {
+                    option = token as SillyOption;
+
+                    bool isValid = directive.AddOption(option);
+                    
+                    if (!isValid)
+                    {
+                        CLIError(arg, "invalid option for directive '" + directive.Name + "'");
+                        directive.PrintOptions();
+
+                        return ((int)Globals.ExitReasons.InvalidOption);
+                    }
+                }
+                else if (token.Type == CLIToken.TokenTypes.Parameter)
+                {
+                    if (option == null)
+                    {
+                        CLIError(arg, "invalid option");
+                        directive.PrintOptions();
+
+                        return ((int)Globals.ExitReasons.InvalidOption);
+                    }
+
+                    bool isValid = option.AddParameter(token.Name);
+
+                    if (!isValid)
+                    {
+                        CLIError(arg, "excessive parameters for option '" + option.Name + "' or invalid parameter");
+
+                        return ((int)Globals.ExitReasons.InvalidParameter);
+                    }
+                }
+            }
+
             try
             {
-                command.Execute(args);
+                directive.Execute();
 
-                Console.WriteLine(command.Command + " successful");
+                Console.WriteLine();
+                Console.WriteLine(directive.Name + " successful");
             }
             catch (Exception ex)
             {
-                Console.WriteLine(command.Command + " Failed with: " + ex.Message);
-
+                CLIError(directive.Name, ex.Message);
+                
                 return ((int)Globals.ExitReasons.DirectiveFail);
             }
 
@@ -50,29 +99,23 @@ namespace silly
 
         private static void OutputDirectives()
         {
-            string usageString = "Usage: silly [";
-
-            foreach(string directive in SillyDirective.KnowDirectiveNames())
-            {
-                usageString += " " + directive;
-            }
-
-            usageString += " ] [ options ]";
-
-            Console.WriteLine(usageString);
-            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("Usage: silly [directive] [options]");
+            Console.ResetColor();
+            Console.WriteLine("where [directive] is one of the following...");
+            Console.WriteLine("");
 
             foreach(SillyDirective directive in SillyDirective.KnownDirectives())
             {
-                string options = string.Empty;
-
-                foreach(KeyValuePair<string, DirectiveOption> option in directive.Options)
-                {
-                    options += "[" + option.Key + "]" + " ";
-                }
-
-                Console.WriteLine(directive.Command + " " + options + " - " + directive.Description);
+                Console.WriteLine(directive.Name + "\t\t" + directive.Description);
             }
+        }
+
+        private static void CLIError(string arg, string error)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("'" + arg + "' : " + error);
+            Console.ResetColor();
         }
 
         private static void OutputFinished()

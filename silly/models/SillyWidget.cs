@@ -11,7 +11,8 @@ namespace silly
 
         protected HtmlDocument Html = new HtmlDocument();
 
-        public SillyWidget(FileInfo widgetFile, string prefix = "")
+        public SillyWidget(FileInfo widgetFile, DirectoryInfo root, string prefix = "")
+            : base(root)
         {
             if (!widgetFile.Exists)
             {
@@ -24,7 +25,7 @@ namespace silly
             LoadHtml();
         }
 
-        public override bool Compile(SiteConfig config = null)
+        public override bool Compile()
         {
             HtmlNode root = Html.DocumentNode;
 

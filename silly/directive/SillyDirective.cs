@@ -4,73 +4,82 @@ using System.Collections.Generic;
 
 namespace silly
 {
-    public abstract class SillyDirective
+    public abstract class SillyDirective : CLIToken
     {
-        public static class Directives
+        public DirectoryInfo DefaultLocation { get; private set; }
+
+        protected string HelpString { get; set; }
+        protected Dictionary<string, SillyOption> ValidOptions = new Dictionary<string, SillyOption>();
+
+        public SillyDirective(string name, string description)
+            : base(name, description, TokenTypes.Directive)
         {
-            public static string New = "new";
-            public static string Compile = "compile";
-            public static string Build = "build";
-            public static string Deploy = "deploy";
+            DefaultLocation = new DirectoryInfo("./");
+
+            ValidOptions.Add(AllowableTokens.Help, null);
+            ValidOptions.Add(AllowableTokens.Location, null);
         }
 
-        private static Dictionary<string, SillyDirective> SupportedDirectives = new Dictionary<string, SillyDirective>()
+        protected abstract void Run();
+        protected virtual void PrintHelp()
         {
-            { Directives.New, new NewDirective(Directives.New) },
-            { Directives.Compile, new CompileDirective(Directives.Compile) },
-            { Directives.Build, new BuildDirective(Directives.Build) },
-            { Directives.Deploy, new DeployDirective(Directives.Deploy) }
-        };
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("silly " + base.Name + " [options]");
+            Console.ResetColor();
+            Console.WriteLine(HelpString);
 
-        public string Command { get; private set; }
-        public string Description { get; private set; }
-        public Dictionary<string, DirectiveOption> Options { get; private set; }
-
-        public SillyDirective(string command, string description)
-        {
-            this.Command = command;
-            this.Description = description;
-            this.Options = new Dictionary<string, DirectiveOption>();
+            PrintOptions();
         }
 
-        public abstract void Execute(string[] args);
-
-        protected void AddOption(DirectiveOption option)
+        public void Execute()
         {
-            if (Options.ContainsKey(option.Name))
+            if (ValidOptions[AllowableTokens.Help] != null)
             {
+                PrintHelp();
+
                 return;
             }
 
-            Options.Add(option.Name, option);
+            LocationOption location = ValidOptions[AllowableTokens.Location] as LocationOption;
+
+            if (location != null)
+            {
+                Console.Write("Checking location...");
+
+                DefaultLocation = location.GetLocation();
+
+                Console.WriteLine("done");
+            }
+
+            Run();
         }
 
-        protected DirectiveOption GetOption(string name)
+        public virtual void PrintOptions()
         {
-            DirectiveOption option = null;
+            Console.WriteLine();
+            Console.WriteLine("valid options for '" + base.Name + "':");
 
-            Options.TryGetValue(name, out option);
+            const string format = "{0,-15} : {1}";
 
-            return(option);
+            foreach(string option in ValidOptions.Keys)
+            {
+                SillyOption opt = CLIToken.CreateToken(option) as SillyOption;
+
+                Console.WriteLine(format, opt.Name, opt.Description);
+            }
         }
 
-        public static SillyDirective CreateDirective(string command)
+        public bool AddOption(SillyOption option)
         {
-            SillyDirective directive = null;
+            if (option == null ||
+                !ValidOptions.ContainsKey(option.Name))
+            {
+                return(false);
+            }
 
-            SupportedDirectives.TryGetValue(command, out directive);
+            ValidOptions[option.Name] = option;
 
-            return(directive);
-        }
-
-        public static Dictionary<string, SillyDirective>.ValueCollection KnownDirectives()
-        {
-            return (SupportedDirectives.Values);
-        }
-
-        public static Dictionary<String, SillyDirective>.KeyCollection KnowDirectiveNames()
-        {
-            return(SupportedDirectives.Keys);
+            return(true);
         }
     }
 }

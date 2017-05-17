@@ -68,7 +68,7 @@ namespace silly
             }
         }
 
-        public override bool Compile(SiteConfig siteConfig = null)
+        public override bool Compile()
         {
             throw new NotImplementedException();
         }

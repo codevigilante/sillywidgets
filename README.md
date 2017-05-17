@@ -10,27 +10,24 @@ Silly Widgets is a static site generator for making client heavy web apps. It us
 
 # usage
 
-**silly new [site-name]** - creates a new [site-name] directory (default is 'newsite') with the structure:
-
-* site-name
+**silly new [-location <path/to/route/directory>] [-name <site-name>]** - Initialize a new silly site:
+  
+* <directory>
     * .silly
         * site_config.json
 	* widgets
+        * hello.html
     * routes
         * index.html 
     * site.json
 
-**silly compile [-location <path/to/route/directory>]** - consumes the site.json and checks for errors  
+**silly compile [-location <path/to/route/directory>]** - Checks the silly site for errors, ensuring widgets referenced exist and all assets are accounted for.  
 
-    -location <path/to/route/directory> compiles site.json at the location  
-
-**silly build [-location <path/to/route/directory>]** - starts a local web server and builds the html based on site.json
-
-     -location <path/to/route/directory> the root location where the server should run    
+**silly build [-location <path/to/route/directory>]** - Compiles the silly site and starts a development HTTP server.   
   
-**silly deploy** - builds up all the static content for pushing to server    
+**silly deploy [-location <path/to/route/directory>]** - Compile and package the silly site for deployment    
   
-# rules
+# rules  
 
 * Widgets cannot reference other widgets
 * Routes can reference widgets only
@@ -38,9 +35,7 @@ Silly Widgets is a static site generator for making client heavy web apps. It us
 
 # todo v0.1
 
-* implement the deploy process
-* implement the new directive
-* figure out how to deploy and distribute
+* figure out how to deploy and distribute (this thing)
 * create website, sillywidgets.com
 
 # todo v0.2

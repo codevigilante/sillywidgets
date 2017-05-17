@@ -8,25 +8,15 @@ namespace silly
 {
     public class SillySite : SillyModel
     {
-        public class SiteOptions
-        {
-            public int LocalPort { get; set; }
-            public SillySitewideVariables SitewideVariables { get; set; }
-            public string DeployTo { get; set; }
-        };
         public SiteOptions Options { get; private set; }
-        public SiteConfig Config { get; private set; }
         public Dictionary<string, SillyRoute> Routes { get; set; }
         public Dictionary<string, FileInfo> NonRouteResources { get; private set; }
-        public DirectoryInfo RootDir { get; private set; }
 
         static public Dictionary<string, SillyWidget> WidgetTable = new Dictionary<string, SillyWidget>();
 
-        private string SiteConfigFileName = @"/.silly/site_config.json";
-
         public SillySite(DirectoryInfo rootDir)
+            : base(rootDir)
         {
-            RootDir = rootDir;
             Routes = new Dictionary<string, SillyRoute>();
             NonRouteResources = new Dictionary<string, FileInfo>();
             Options = new SiteOptions();            
@@ -34,47 +24,20 @@ namespace silly
             Options.DeployTo = "deploy";
         }
 
-        public bool Setup(SiteConfig config = null)
+        public bool Setup()
         {
-            if (config == null)
-            {
-                FileInfo siteConfigJsonFilename = new FileInfo(RootDir.FullName + SiteConfigFileName);
+            Console.Write("Reading site json config...");
 
-                Console.Write("Reading " + siteConfigJsonFilename.FullName + "...");
-
-                if (!siteConfigJsonFilename.Exists)
-                {
-                    throw new Exception("Can't resolve " + siteConfigJsonFilename.FullName);
-                }
-
-                Config = JsonConvert.DeserializeObject<SiteConfig>(File.ReadAllText(siteConfigJsonFilename.FullName));
-
-                if (Config == null)
-                {
-                    throw new Exception("Problem interpreting " + siteConfigJsonFilename.FullName);
-                }
-                
-                Console.WriteLine("done");
-            }
-            else
-            {
-                Config = config;
-            }
-
-            FileInfo siteJsonFilename = new FileInfo(RootDir.FullName + "/" + Config.EntryPoint);
-
-            Console.Write("Reading " + siteJsonFilename.FullName + "...");
-
-            Options = JsonConvert.DeserializeObject<SiteOptions>(File.ReadAllText(siteJsonFilename.FullName));
+            Options = SiteOptions.DiscoveryInDirectory(RootDir);
 
             if (Options == null)
             {
-                throw new Exception("Problem interpreting " + siteJsonFilename.FullName);
+                throw new Exception("Cannot find suitable site json config");
             }
 
             Console.WriteLine("done");
 
-            DirectoryInfo widgetsDir = CheckDirectory(Config.Widgets);
+            DirectoryInfo widgetsDir = CheckDirectory(Options.Widgets);
 
             if (widgetsDir != null)
             {
@@ -88,13 +51,13 @@ namespace silly
             return(true);
         }
 
-        public override bool Compile(SiteConfig config = null)
+        public override bool Compile()
         {
             Console.WriteLine("Compiling...");          
 
-            Setup(config);
+            Setup();
 
-            DirectoryInfo routesDir = CheckDirectory(Config.Routes);
+            DirectoryInfo routesDir = CheckDirectory(Options.Routes);
 
             if (routesDir != null)
             {
@@ -159,6 +122,8 @@ namespace silly
 
                 Console.WriteLine("done");
 
+                Console.Write("Deploying route " + route.Key + ".html");
+
                 FileInfo deployFile = new FileInfo(deploymentDir.FullName + route.Key + ".html");
 
                 deployFile.Directory.Create();
@@ -167,6 +132,8 @@ namespace silly
                 {
                     routeFile.Write(Encoding.ASCII.GetBytes(payload), 0, payload.Length);
                 }
+
+                Console.WriteLine("done");
             }
 
             return(true);
@@ -243,11 +210,11 @@ namespace silly
             {
                 if (String.Compare(routeFile.Extension, ".html", true) == 0)
                 {
-                    SillyRoute route = new SillyRoute(routeFile, totalPath);
+                    SillyRoute route = new SillyRoute(routeFile, routesDir, totalPath);
 
                     Console.Write("Compiling " + route.ID + "...");
 
-                    route.Compile(Config);
+                    route.Compile();
 
                     Routes.Add(route.ID, route);
 
@@ -275,11 +242,11 @@ namespace silly
             {
                 if (String.Compare(widgetFile.Extension, ".html", true) == 0)
                 {
-                    SillyWidget widget = new SillyWidget(widgetFile, currentPath + pathSuffix);
+                    SillyWidget widget = new SillyWidget(widgetFile, widgetsDir, currentPath + pathSuffix);
 
                     Console.Write("Compiling " + widget.ID + "...");
 
-                    widget.Compile(Config);
+                    widget.Compile();
 
                     SillySite.WidgetTable.Add(widget.ID, widget);
 

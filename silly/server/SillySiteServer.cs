@@ -21,7 +21,7 @@ namespace silly
             this.Site = site;
             IP = IPAddress.Loopback;
 
-            WebRoot = new DirectoryInfo(Site.RootDir + "/" + Site.Config.Routes);
+            WebRoot = new DirectoryInfo(Site.RootDir + "/" + Site.Options.Routes);
 
             if (!WebRoot.Exists)
             {
@@ -100,7 +100,7 @@ namespace silly
                         {
                             if (String.Compare(requestedFile.Extension, ".html", true) == 0)
                             {
-                                SillyRoute route = new SillyRoute(requestedFile);
+                                SillyRoute route = new SillyRoute(requestedFile, WebRoot);
 
                                 response.Payload = route.Resolve();
                             }
