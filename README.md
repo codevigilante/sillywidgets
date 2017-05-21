@@ -34,22 +34,20 @@ There's also scripts to publish to specific platforms. Such as `publish_mac_10.1
 
 # usage
 
-**silly new [-location <path/to/route/directory>] [-name <site-name>]** - Initialize a new silly site:
+`silly new [-location <path/to/route/directory>] [-name <site-name>]` - Initialize a new silly site:
   
-* <directory>
-    * .silly
-        * site_config.json
+* `<directory>`
 	* widgets
         * hello.html
     * routes
         * index.html 
-    * site.json
+    * `<directory>`.json
 
-**silly compile [-location <path/to/route/directory>]** - Checks the silly site for errors, ensuring widgets referenced exist and all assets are accounted for.  
+`silly compile [-location <path/to/route/directory>]` - Checks the silly site for errors, ensuring widgets referenced exist and all assets are accounted for.  
 
-**silly build [-location <path/to/route/directory>]** - Compiles the silly site and starts a development HTTP server.   
+`silly build [-location <path/to/route/directory>]` - Compiles the silly site and starts a development HTTP server.   
   
-**silly deploy [-location <path/to/route/directory>]** - Compile and package the silly site for deployment    
+`silly deploy [-location <path/to/route/directory>]` - Compile and package the silly site for deployment    
   
 # rules  
 
