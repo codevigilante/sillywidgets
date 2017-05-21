@@ -4,6 +4,11 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.1</TargetFramework>
     <RuntimeIdentifiers>win8-x64;win81-x64;win10-x64;osx.10.10-x64;osx.10.11-x64;osx.10.12-x64</RuntimeIdentifiers>
+    <Version>0.1</Version>
+    <PackageId>sillywidgets</PackageId>
+    <Title>Silly Widgets</Title>
+    <Authors>A-ron</Authors>
+    <Description>Silly Widgets is a static site generator for making client heavy web apps. It uses the concept of widgets, which are bits of reusable HTML to construct complex web sites. For Windows and Mac.</Description>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />

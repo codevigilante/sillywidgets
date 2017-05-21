@@ -12,7 +12,7 @@ namespace silly
                 OutputAbout();
                 OutputDirectives();
 
-                return ((int)Globals.ExitReasons.About);
+                return ((int)Globals.ExitReasons.OK);
             }
 
             SillyDirective directive = SillyDirective.CreateDirective(args[0]);
