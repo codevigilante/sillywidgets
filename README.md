@@ -26,9 +26,9 @@ In the works...
 
 1. Download dotnet CLI tools from [here](https://www.microsoft.com/net/core)
 1. `git clone https://github.com/codevigilante/sillywidgets.git`
-1. cd into silly directory
-1. dotnet build
-1. dotnet publish -c Release -r osx.10.11-x64
+1. `cd` into silly directory
+1. `dotnet build` builds the app, duh
+1. `dotnet publish -c Release -r osx.10.11-x64` packages the app for deployment to a specific target, in this case, MacOS 10.11 x64
 
 There's also scripts to publish to specific platforms. Such as `publish_mac_10.11.sh` Give one of them a shot if you're feeling lazy.
 
