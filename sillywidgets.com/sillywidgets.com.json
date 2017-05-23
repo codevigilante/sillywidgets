@@ -1,0 +1,10 @@
+{
+  "SillyWidgets": "v0.1",
+  "LocalPort": 7575,
+  "SitewideVariables": {
+    "Version": "0.1"
+  },
+  "DeployTo": "deploy",
+  "Widgets": "widgets",
+  "Routes": "routes"
+}
