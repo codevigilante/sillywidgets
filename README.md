@@ -1,4 +1,4 @@
-# sillywidgets
+# sillywidgets v0.1
 
 An atypical static site generator built using .NET Core 1.1. For Mac and Windows.
 
@@ -15,12 +15,17 @@ Silly Widgets is a static site generator for making client heavy web apps. It us
 1. In Terminal, go to the directory where you unzipped the archive.
 1. Run `chmod +x ./install.sh`
 1. Then run `./install.sh`
+1. Enjoy!
 
 Silly Widgets installs to your `/usr/local/lib` directory and creates a link in `/usr/local/bin` to the `silly` executable. This allows you to enjoy `silly` from wherever you like to develop.
 
 ## on Windows
 
-In the works...
+1. Download the Windows archive from [sillywidgets.com/win](http://sillywidgets.com/win)
+1. Unzip it to a reasonable location.
+1. Enjoy!
+
+To make it easier to run the `silly` command, append the directory where the archive was unzipped to the PATH environment variable.
 
 ## build from source
 
@@ -55,11 +60,8 @@ There's also scripts to publish to specific platforms. Such as `publish_mac_10.1
 * Routes can reference widgets only
 * The directory structure of routes will be the exact same structure that's built
 
-# todo v0.1
+# the future
 
 * create website, sillywidgets.com
-
-# todo v0.2
-
 * figure out how to pass in and resolve variables, like {{version}}
 * read and send images to the client in build mode
