@@ -66,7 +66,6 @@ There's also scripts to publish to specific platforms. Such as `publish_mac_10.1
 
 # the future
 
-* create website, sillywidgets.com
 * figure out how to pass in and resolve variables, like {{version}}
     * extend this to more complex things like collections and "classes" of data
 * read and send images to the client in build mode
