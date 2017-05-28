@@ -48,7 +48,7 @@ namespace silly
             {
                 string consoleStr = string.Empty;
                 Socket socket = null;
-                SillyHttpResponse response = new SillyHttpResponse(SillyHttpResponse.MimeType.TextHtml, SillyHttpResponse.ResponseCodes.OK, TestPayload);
+                SillyHttpResponse response = new SillyHttpResponse(SillyHttpResponse.MimeType.TextHtml, SillyHttpResponse.ResponseCodes.OK, Encoding.ASCII.GetBytes(TestPayload));
 
                 try
                 {
@@ -102,14 +102,25 @@ namespace silly
                             {
                                 SillyRoute route = new SillyRoute(requestedFile, WebRoot);
 
-                                response.Payload = route.Resolve();
+                                response.Payload = Encoding.ASCII.GetBytes(route.Resolve());
                             }
                             else
                             {
                                 SillyResource resource = new SillyResource(requestedFile);
 
-                                // this won't work for images, Payload needs to be a byte[]
-                                response.Payload = ASCIIEncoding.ASCII.GetString(resource.Contents());
+                                response.Payload = resource.Contents();
+
+                                switch(resource.Type)
+                                {
+                                    case SillyResource.Types.CSS:
+                                        response.Mime = SillyHttpResponse.MimeType.TextCss;
+                                        break;
+                                    case SillyResource.Types.JS:
+                                        response.Mime = SillyHttpResponse.MimeType.ApplicationJavascript;
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
 
                             consoleStr += "-> RESOURCE " + request.URL + " RESOLVED ";
@@ -117,7 +128,7 @@ namespace silly
                         else
                         {
                             response.Code = SillyHttpResponse.ResponseCodes.NotFound;
-                            response.Payload = Error404;
+                            response.Payload = Encoding.ASCII.GetBytes(Error404);
 
                             throw new Exception(" RESOURCE " + request.URL + " DOES NOT EXIST ");
                         }
