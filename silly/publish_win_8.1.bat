@@ -12,6 +12,6 @@ dotnet publish -c Release -r win81-x64
 echo ***** Copying install script
 copy .\installscripts\INSTALL_WIN.TXT .\bin\Release\netcoreapp1.1\win81-x64\INSTALL.TXT
 echo ***** Creating archive
-7z a -t7z .\bin\Release\netcoreapp1.1\win81-x64\sillywidgets-v0.1.7z .\bin\Release\netcoreapp1.1\win81-x64\*
+7z a -t7z .\bin\Release\netcoreapp1.1\win81-x64\sillywidgets-v0.2.7z .\bin\Release\netcoreapp1.1\win81-x64\*
 echo ***** Complete
 echo -----------------------------------------------------

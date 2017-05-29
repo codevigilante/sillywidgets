@@ -11,9 +11,9 @@ namespace silly
         public MimeType Mime { get; set; }
         public ResponseCodes Code { get; set; }
         public string Version { get; set; }
-        public string Payload { get; set; }
+        public Byte[] Payload { get; set; }
 
-        public SillyHttpResponse(MimeType mime, ResponseCodes code, string payload)
+        public SillyHttpResponse(MimeType mime, ResponseCodes code, Byte[] payload)
         {
             Mime = mime;
             Version = "HTTP/1.1";
@@ -46,10 +46,7 @@ namespace silly
         public void SendResponse(Socket socket)
         {
             SendHeader(socket, Payload.Length);
-
-            Byte[] data = Encoding.ASCII.GetBytes(Payload);
-
-            Send(socket, data);
+            Send(socket, Payload);
         }
 
         private void SendHeader(Socket socket, int contentSize)

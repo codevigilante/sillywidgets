@@ -204,9 +204,10 @@ namespace silly
                 pathSuffix = "/";
             }
 
+            DirectoryInfo currentDir = new DirectoryInfo(routesDir.FullName + currentPath);
             string totalPath = currentPath + pathSuffix;
 
-            foreach(FileInfo routeFile in routesDir.GetFiles())
+            foreach(FileInfo routeFile in currentDir.GetFiles())
             {
                 if (String.Compare(routeFile.Extension, ".html", true) == 0)
                 {
@@ -228,9 +229,9 @@ namespace silly
                 }
             }
 
-            foreach(DirectoryInfo routeSubDir in routesDir.GetDirectories())
+            foreach(DirectoryInfo routeSubDir in currentDir.GetDirectories())
             {
-                BuildRoutes(routeSubDir, totalPath + routeSubDir.Name);
+                BuildRoutes(routesDir, totalPath + routeSubDir.Name);
             }
         }
 

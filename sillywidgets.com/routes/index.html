@@ -1,8 +1,107 @@
 <html>
 	<head>
-		<title>Silly Widgets v0.1</title>
+		<meta charset="utf-8">
+		<title>Silly Widgets - Atypical static site generator</title>
+		<meta name="description" content="an atypical static site generator">
+		<meta name="author" content="A-ron">
+
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
-		<div silly-widget="header"></div>
+		<div class="container">
+			<div silly-widget="nav"></div>
+			<div silly-widget="hero"></div>
+
+			<h1 class="page-header">Install</h1>				  
+
+			<div class="row">
+				<div class="col-md-4">
+					<div class="page-header">
+  						<h1><small>Mac OSX 10.11+</small></h1>				  
+					</div>
+
+					<ul class="list-group">
+  						<li class="list-group-item"><a href="/download">Download the Mac archive</a>.</li>
+  						<li class="list-group-item">Unzip it to a reasonable location.</li>
+  						<li class="list-group-item">In Terminal, go to the directory where you unzipped the archive.</li>
+  						<li class="list-group-item">Run <code>chmod +x ./install.sh</code></li>
+  						<li class="list-group-item">Then run <code>./install.sh</code></li>
+						<li class="list-group-item">Enjoy!</li>
+					</ul>
+
+					<div class="alert alert-warning" role="alert">Silly Widgets installs to your <code>/usr/local/lib</code> directory and creates a link in <code>/usr/local/bin</code> to the <code>silly</code> executable. This allows you to enjoy <code>silly</code> from wherever you like to develop.</div>
+				</div>
+				<div class="col-md-4">
+					<div class="page-header">
+  						<h1><small>Windows 8.1+</small></h1>				  
+					</div>
+
+					<ul class="list-group">
+  						<li class="list-group-item"><a href="/download">Download the Windows archive</a>.</li>
+  						<li class="list-group-item">Unzip it to a reasonable location.</li>
+  						<li class="list-group-item">Enjoy!</li>
+					</ul>
+					
+					<div class="alert alert-warning" role="alert">To make it easier to run the <code>silly</code> command, append the directory where the archive was unzipped to the <code>PATH</code> environment variable.</div>
+				</div>
+				<div class="col-md-4">
+					<div class="page-header">
+  						<h1><small>From Source</small></h1>				  
+					</div>
+
+					<ul class="list-group">
+  						<li class="list-group-item"><a href="https://www.microsoft.com/net/core">Download dotnet CLI tools</a>.</li>
+  						<li class="list-group-item"><code>git clone https://github.com/codevigilante/sillywidgets.git</code></li>
+  						<li class="list-group-item"><code>cd</code> into silly directory.</li>
+  						<li class="list-group-item"><code>dotnet build</code> builds the app, duh.</li>
+  						<li class="list-group-item"><code>dotnet publish -c Release -r osx.10.11-x64</code> packages the app for deployment to a specific target, in this case, MacOS 10.11 x64. Other targets can be found in the <code>silly.csproj</code> file.</li>
+						<li class="list-group-item">Enjoy!</li>
+					</ul>
+
+					<div class="alert alert-warning" role="alert">There's also scripts to publish to specific platforms. Such as <code>publish_mac_10.11.sh</code>. Give one of them a shot if you're feeling lazy.</div>
+				</div>
+			</div>
+
+			<h1 class="page-header">Use</h1>
+
+			<div class="panel panel-default">
+  				<div class="panel-heading"><code>silly</code></div>
+  				<div class="panel-body">Shows help and version info, listing all the directives available.</div>
+			</div>
+
+			<div class="panel panel-default">
+  				<div class="panel-heading"><code>silly new [-location path/to/route/directory] [-name "site-name"]</code></div>
+  				<div class="panel-body">Initializes a new silly site. Creates a <code>widgets</code> and <code>routes</code> directory in the specified <code>-location</code>, or the current directory if not given. Also creates a default <code>[directory name].json</code>, which is the editable configuration for the site. Setups a default <code>index.html</code> in <code>routes</code> and <code>hello.html</code> in <code>widgets</code>.</div>
+			</div>
+
+			<div class="panel panel-default">
+  				<div class="panel-heading"><code>silly compile [-location path/to/route/directory]</code></div>
+  				<div class="panel-body">Checks the silly site for errors, ensuring widgets referenced exist and all assets are accounted for. It also parses the HTML and will throw errors if it's invalid. <code>-location</code> points to the directory where the silly site can be found, otherwise the current directory is used.</div>
+			</div>
+
+			<div class="panel panel-default">
+  				<div class="panel-heading"><code>silly build [-location path/to/route/directory]</code></div>
+  				<div class="panel-body">"Shallow" compiles the silly site and starts a development HTTP server. The default port is 7575 and can be changed in <code>[site].json</code>. <code>-location</code> points to the directory where the silly site can be found, otherwise the current directory is used.</div>
+			</div>
+
+			<div class="panel panel-default">
+  				<div class="panel-heading"><code>silly deploy [-location path/to/route/directory]</code></div>
+  				<div class="panel-body">Compile and package the silly site for deployment. Creates a <code>deploy</code> directory, resolves all widget references in all the route files, and copies over asset files. This is intended to be uploaded to a static server. <code>-location</code> points to the directory where the silly site can be found, otherwise the current directory is used.</div>
+			</div>
+
+			<h1 class="page-header">Rules</h1>
+
+			<ul class="list-group">
+				<li class="list-group-item">Widgets cannot reference other widgets (yet).</li>
+				<li class="list-group-item">Routes can reference widgets only.</li>
+				<li class="list-group-item">The directory structure in routes will be the exact same structure that's built for deployment.</li>
+			</ul>
+
+			<div silly-widget="footer"></div>
+		</div>
+
+		<script src="js/jquery-3.2.1.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
 	</body>
 </html>
