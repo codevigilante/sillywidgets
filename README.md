@@ -68,3 +68,5 @@ There's also scripts to publish to specific platforms. Such as `publish_mac_10.1
 
 * figure out how to pass in and resolve variables, like {{version}}
     * extend this to more complex things like collections and "classes" of data
+* create install command line option
+* integrate with AWS S3 to easily upload deployment
