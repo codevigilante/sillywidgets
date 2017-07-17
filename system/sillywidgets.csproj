@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <Version>0.3</Version>
+    <PackageId>SillyWidgets</PackageId>
+    <Title>Silly Widgets</Title>
+    <Authors>A-ron</Authors>
+    <Description>Silly Widgets - a silly little C# framework for AWS Lambda.</Description>
+    <PackageTags>Lambda;WebApp;C#</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="HtmlAgilityPack.NetCore" Version="1.5.0.1" />
+    <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.1.0" /> 
+    <PackageReference Include="Amazon.Lambda.TestUtilities" Version="1.0.0" />   
+  </ItemGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="Amazon.Lambda.Tools" Version="1.6.0" />
+  </ItemGroup>
+
+</Project>

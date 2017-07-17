@@ -1,4 +1,4 @@
-# sillywidgets v0.1
+# sillywidgets v0.3
 
 An atypical static site generator built using .NET Core 1.1. For Mac and Windows.
 
