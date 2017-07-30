@@ -31,6 +31,8 @@ namespace SillyWidgets
                     return(false);
                 }
 
+                //Console.WriteLine("Testing route = " + route.UrlPattern + ":" + route.Name);
+
                 currentRoute = route;
 
                 int index = 0;
@@ -238,6 +240,13 @@ namespace SillyWidgets
 
             public void VisitStatic(SillyHardCodedSegment hardCoded)
             {
+                if (hardCoded.IsRoot && String.IsNullOrEmpty(currentSegment))
+                {
+                    segmentConsumed = true;
+
+                    return;
+                }
+
                 if (String.Compare(hardCoded.Value, currentSegment, true) == 0)
                 {
                     segmentConsumed = true;
@@ -284,6 +293,11 @@ namespace SillyWidgets
 
             return(route);
         }   
+
+        public static void ClearRoutes()
+        {
+            Routes.Clear();
+        }
 
         public static ISillyContent Dispatch(string path, ISillyContext context)
         {

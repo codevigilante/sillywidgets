@@ -22,10 +22,18 @@ namespace SillyWidgets
 
     public class SillyHardCodedSegment : SillySegment
     {
+        public bool IsRoot { get; private set; }
+
         public SillyHardCodedSegment(string text)
             : base(text, SegmentTypes.HardCoded)
         {
+            IsRoot = false;
+        }
 
+        public SillyHardCodedSegment()
+            : this("/")
+        {
+            IsRoot = true;
         }
 
         public override void Visit(ISillySegmentVisitor visitor)

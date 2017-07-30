@@ -14,7 +14,7 @@ namespace SillyWidgets.Samples
         {
             SillyContent content = new SillyContent();
 
-            content.Content = "<h1>Root.Index()</h1>";
+            content.Content = "<h1>Silly Site</h1><h3>Root.Index</h3>";
 
             return(content);
         }

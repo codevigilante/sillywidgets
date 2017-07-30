@@ -71,7 +71,7 @@ namespace SillyWidgets
 
             if (matches == null || matches.Length == 0)
             {
-                SillySegment rootSegment = new SillyHardCodedSegment("/");
+                SillySegment rootSegment = new SillyHardCodedSegment();
 
                 Add(rootSegment);
 

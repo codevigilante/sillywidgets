@@ -80,6 +80,9 @@ namespace system.test
                 new Admin()
             });
 
+            SillyRouteMap.ClearRoutes();
+
+            SillyRouteMap.MapRoute("empty", "/", new SillyRouteDetails("Root", "SexTaco"));
             SillyRouteMap.MapRoute("home", "/:method", new SillyRouteDetails("Root", "Index"));
             SillyRouteMap.MapRoute("users", "/admin/users/{var}/{names}", new SillyRouteDetails("Admin", "Users"));
             SillyRouteMap.MapRoute("twovars", "/:controller/:method/{var1}/{var2}", new SillyRouteDetails("Admin", "Index")
@@ -151,6 +154,15 @@ namespace system.test
                 ISillyContent content = new SillyContent();
 
                 content.Content = "<h1>Root.Content</h1>";
+
+                return(content);
+            }
+
+            public ISillyContent SexTaco(ISillyContext context)
+            {
+                ISillyContent content = new SillyContent();
+
+                content.Content = "<h1>Root.SexTaco</h1>";
 
                 return(content);
             }

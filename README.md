@@ -28,9 +28,5 @@ Silly Widgets is a C# web framework, using .NET Core, that runs on Amazon's Lamb
 
 # todo
 
-* match incoming routes
-* dispatch routes
-* test incoming route matching
-* push
 * figure out how to deal with views
 * figure out how to deal with database stuff
