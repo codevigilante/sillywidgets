@@ -117,6 +117,11 @@ namespace SillyWidgets
 
                 if (Controller == null)
                 {
+                    if (!String.IsNullOrEmpty(primary))
+                    {
+                        return(false);
+                    }
+                    
                     Controller = GetController(fallback);
 
                     return(Controller != null);
@@ -149,6 +154,11 @@ namespace SillyWidgets
 
                 if (Method == null)
                 {
+                    if (!String.IsNullOrEmpty(primary))
+                    {
+                        return(false);
+                    }
+
                     Method = GetMethod(fallback, allMethods);
 
                     return (Method != null);
