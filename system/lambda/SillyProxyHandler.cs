@@ -40,7 +40,7 @@ namespace SillyWidgets
                 }
             
                 ISillyContext sillyContext = CreateContext(input);                
-                ISillyContent sillyContent = Dispatch(input.path, sillyContext);
+                ISillyContent sillyContent = SillyRouteMap.Dispatch(input.path, sillyContext);
 
                 if (sillyContent == null)
                 {
@@ -63,72 +63,6 @@ namespace SillyWidgets
             {
                 return(buildErrorResponse(SillyHttpStatusCode.ServerError, Ex.Message));
             }
-        }
-
-        protected virtual ISillyContent Dispatch(string path, ISillyContext context)
-        {
-            /*if (String.IsNullOrEmpty(path))
-            {
-                throw new SillyException(SillyHttpStatusCode.BadRequest, "Requested path '" + path + "' does not exist.");
-            }
-
-            string[] segments = ParsePath(path, false);
-            ISillyTreeNode<AbstractSillyController> controller = Root;
-            object[] parameters = new object[1] { context };
-            int index = 0;
-
-            // when the lowest controller is reached, figure out which method matches the remaining segments
-
-            if(segments != null &&
-               segments.Length > 0)
-            {
-                bool controllerFound = false;
-
-                for(; index < segments.Length; ++index)
-                {
-                    string segment = segments[index];
-
-                    if (!controllerFound)
-                    {
-                        ISillyTreeNode<AbstractSillyController> node = controller.GetChild(segment);
-
-                        if(node != null)
-                        {
-                            controller = node;
-                        }
-                        else
-                        {
-                            controllerFound = true;
-                        }
-                    }
-                    else
-                    {
-                        parameters.Append(segment);
-                    }
-                }
-            }
-
-            IEnumerable<MethodInfo> methods = QueryMethods(controller.Value.GetType().GetMethods(), IndexKey, parameters.Length);
-
-            if (methods == null ||
-                methods.Count() == 0)
-            {
-                throw new SillyException(SillyHttpStatusCode.NotFound, "The path " + path + " does not exist.");
-            }
-
-            try
-            {
-                ISillyContent content = methods.ElementAt(0).Invoke(controller.Value, (parameters.Length == 0) ? null : parameters) as ISillyContent;
-
-                return(content);
-            }
-            catch(Exception ex)
-            {
-                throw new SillyException(SillyHttpStatusCode.NotFound, ex.Message);
-            }
-
-            */
-            return(null);
         }
 
         protected virtual ISillyContext CreateContext(SillyProxyRequest request)

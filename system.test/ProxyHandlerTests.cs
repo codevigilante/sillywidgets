@@ -1,5 +1,6 @@
 using Xunit;
 using SillyWidgets;
+using SillyWidgets.Samples;
 
 namespace system.test
 {

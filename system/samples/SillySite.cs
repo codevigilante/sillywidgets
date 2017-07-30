@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SillyWidgets
+namespace SillyWidgets.Samples
 {
     public class SillySite : SillyProxyHandler
     {

@@ -36,9 +36,9 @@ namespace system.test
             {
                 Console.WriteLine("Testing valid route: " + route);
                 
-                bool success = SillyRoute.IsValidUrlPattern(route);
+                SillyRoute sr = new SillyRoute("something", route);
 
-                Assert.True(success);
+                Assert.True(sr.IsValid);
             }
         }
 
@@ -56,16 +56,146 @@ namespace system.test
                 "/something/:controller/somethingELSE/:snatch/something_even_more/another-thing-that-is-here/{var_67#er}",
                 "{askldhflaksdhfalksdjf",
                 "/:method/lskdfnvlnweoirn4}/",
-                "/_____________________/------------------------/stink/12***43/"
+                "/_____________________/------------------------/stink/12***43/",
+                "/:controller/something/:controller",
+                "/something/:controller/:method/{var}/{var2}/:method"
             };
 
             foreach(string route in validRoutes)
             {
                 Console.WriteLine("Testing invalid route: " + route);
-                
-                bool success = SillyRoute.IsValidUrlPattern(route);
 
-                Assert.False(success);
+                SillyRoute sr = new SillyRoute("something", route);
+
+                Assert.False(sr.IsValid);
+            }
+        }
+
+        [Fact]
+        public void DispatchTests()
+        {
+            SillyRouteMap.SetAvailableControllers(new List<AbstractSillyController>()
+            {
+                new Root(),
+                new Admin()
+            });
+
+            SillyRouteMap.MapRoute("home", "/:method", new SillyRouteDetails("Root", "Index"));
+            SillyRouteMap.MapRoute("users", "/admin/users/{var}/{names}", new SillyRouteDetails("Admin", "Users"));
+            SillyRouteMap.MapRoute("twovars", "/:controller/:method/{var1}/{var2}", new SillyRouteDetails("Admin", "Index")
+            {
+                { "var1", "herpes" },
+                { "var2", "AIDS" }
+            });
+            SillyRouteMap.MapRoute("admin", "/:controller/:method", new SillyRouteDetails("Admin", "Index"));
+
+            List<string> routes = new List<string>()
+            {
+                "/",
+                "/about",
+                "/content",
+                "/admin",
+                "/admin/dashboard",
+                "/admin/users/123/sexdolle",
+                "/admin/dildo/sex/pistol",
+                "/admin/dildo"
+            };
+
+            foreach(string route in routes)
+            {
+                Console.Write("Dispatch Route " + route + " -> ");
+                
+                try
+                {
+                    ISillyContent content = SillyRouteMap.Dispatch(route, null);
+
+                    Console.WriteLine((content == null) ? "null" : content.Content);
+
+                    Assert.NotEqual(content, null);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+
+                    Assert.True(false);
+                }
+            }
+        }
+
+        public class Root : AbstractSillyController
+        {
+            public Root()
+            {          
+            }
+
+            public ISillyContent Index(ISillyContext context)
+            {
+                ISillyContent content = new SillyContent();
+
+                content.Content = "<h1>Root.Index</h1>";
+
+                return(content);
+            }
+
+            public ISillyContent About(ISillyContext context)
+            {
+                ISillyContent content = new SillyContent();
+
+                content.Content = "<h1>Root.About</h1>";
+
+                return(content);
+            }
+
+            public ISillyContent Content(ISillyContext context)
+            {
+                ISillyContent content = new SillyContent();
+
+                content.Content = "<h1>Root.Content</h1>";
+
+                return(content);
+            }
+        }
+
+        public class Admin : AbstractSillyController
+        {
+            public Admin()
+            {
+            }
+
+            public ISillyContent Index(ISillyContext context)
+            {
+                ISillyContent content = new SillyContent();
+
+                content.Content = "<h1>Admin.Index</h1>";
+
+                return(content);
+            }
+
+            public ISillyContent Dashboard(ISillyContext context)
+            {
+                ISillyContent content = new SillyContent();
+
+                content.Content = "<h1>Admin.Dashboard</h1>";
+
+                return(content);
+            }
+
+            public ISillyContent Users(ISillyContext context, object var, object names)
+            {
+                ISillyContent content = new SillyContent();
+
+                content.Content = "<h1>Admin.Users(v1, v2)</h1>";
+
+                return(content);
+            }
+
+            public ISillyContent Dildo(ISillyContext context, object var, object var2)
+            {
+                ISillyContent content = new SillyContent();
+
+                content.Content = "<h1>Admin.Dildo(v1, v2)</h1>";
+
+                return(content);
             }
         }
         
