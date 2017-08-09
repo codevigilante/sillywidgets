@@ -1,21 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace SillyWidgets.Samples
 {
-    public class SillySite : SillyProxyHandler
+    public class SillySite : SillyProxyApplication
     {
         public SillySite()
             : base()
         {
-            Console.WriteLine("SillySite");
-            
-            SillyRouteMap.SetAvailableControllers(new List<AbstractSillyController>()
-            {
-                new Root()
-            });
+            base.RegisterController("root", typeof(Root));
 
-            SillyRouteMap.MapRoute("root", "/", new SillyRouteDetails("Root", "Index"));
+            GET("root", "/", "root", "Index");
         }
     }
 }

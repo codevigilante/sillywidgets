@@ -12,12 +12,10 @@ using Amazon;
 
 namespace SillyWidgets
 {
-    public abstract class SillyProxyHandler : SillyHandler
+    public abstract class SillyProxyApplication : SillyApplication
     {
-        private string IndexKey = "Index";
-        private string RootKey = "/";
 
-        public SillyProxyHandler()
+        public SillyProxyApplication()
         {
         }
 
@@ -29,10 +27,10 @@ namespace SillyWidgets
         {
             try
             {
-                if (SillyRouteMap.RouteCount() == 0)
+                /*if (SillyRouteMap.RouteCount() == 0)
                 {
                     throw new SillyException(SillyHttpStatusCode.NotImplemented, "This site isn't configured for prime time just yet. Please try again later");
-                }
+                }*/
 
                 if (input == null)
                 {
@@ -40,7 +38,7 @@ namespace SillyWidgets
                 }
             
                 ISillyContext sillyContext = CreateContext(input);                
-                ISillyContent sillyContent = SillyRouteMap.Dispatch(input.path, sillyContext);
+                ISillyContent sillyContent = Dispatch(sillyContext);
 
                 if (sillyContent == null)
                 {
@@ -68,39 +66,6 @@ namespace SillyWidgets
         protected virtual ISillyContext CreateContext(SillyProxyRequest request)
         {
             return (new SillyProxyContext(request));
-        }
-
-        protected string[] ParsePath(string path, bool keepSlashes = true)
-        {
-            if (path == null ||
-                String.IsNullOrEmpty(path))
-            {
-                return(null);
-            }
-
-            string pattern = keepSlashes ? @"(\/)" : @"\/";
-
-            string[] matches = Regex.Split(path, pattern, RegexOptions.IgnoreCase);
-
-            return(matches);
-        }
-
-        private IEnumerable<MethodInfo> QueryMethods(MethodInfo[] methodInfos, string methodKey, int varCount)
-        {
-            IEnumerable<MethodInfo> methods = null;
-            
-            if (!String.IsNullOrEmpty(methodKey))
-            {
-                methods = methodInfos.Where
-                (
-                    m => String.Compare(m.Name, methodKey, true) == 0 &&
-                         m.ReturnType.IsAssignableFrom(typeof(ISillyContent)) &&
-                         m.GetParameters().Length == varCount &&
-                         m.GetParameters()[0].ParameterType == typeof(ISillyContext)
-                );
-            }
-
-            return(methods);
         }
 
         private SillyProxyResponse buildErrorResponse(SillyException ex)

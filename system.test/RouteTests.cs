@@ -25,18 +25,20 @@ namespace system.test
                 "/under_score/dash-dash/mix_987-iuFDS",
                 "/56/76/32",
                 "/:controller/:method/{var}",
+                "/dingus/{var}=poophole/{var}/{var}=89",
                 "/something/:controller/somethingELSE/:method/something_even_more/another-thing-that-is-here/{var_67#er}",
                 "/hello/world/",
                 "/:method/{lskdfnvlnweoirn4}/",
                 "/{werv435vw3v3rnqoi3rnvoiq3vq 3rvqi3v  3qrv q3 v q3ovi}",
-                "/_____________________/------------------------/{var56}/"
+                "/_____________________/------------------------/{var56}/",
+                "/something/{var}="
             };
 
             foreach(string route in validRoutes)
             {
                 Console.WriteLine("Testing valid route: " + route);
                 
-                SillyRoute sr = new SillyRoute("something", route);
+                SillyRoute sr = new SillyRoute("something", route, "", "");
 
                 Assert.True(sr.IsValid);
             }
@@ -58,14 +60,15 @@ namespace system.test
                 "/:method/lskdfnvlnweoirn4}/",
                 "/_____________________/------------------------/stink/12***43/",
                 "/:controller/something/:controller",
-                "/something/:controller/:method/{var}/{var2}/:method"
+                "/something/:controller/:method/{var}/{var2}/:method",
+                "/hello/{var}89"
             };
 
             foreach(string route in validRoutes)
             {
                 Console.WriteLine("Testing invalid route: " + route);
 
-                SillyRoute sr = new SillyRoute("something", route);
+                SillyRoute sr = new SillyRoute("something", route, "", "");
 
                 Assert.False(sr.IsValid);
             }
@@ -74,23 +77,7 @@ namespace system.test
         [Fact]
         public void DispatchTests()
         {
-            SillyRouteMap.SetAvailableControllers(new List<AbstractSillyController>()
-            {
-                new Root(),
-                new Admin()
-            });
-
-            SillyRouteMap.ClearRoutes();
-
-            SillyRouteMap.MapRoute("empty", "/", new SillyRouteDetails("Root", "SexTaco"));
-            SillyRouteMap.MapRoute("home", "/:method", new SillyRouteDetails("Root", "Index"));
-            SillyRouteMap.MapRoute("users", "/admin/users/{var}/{names}", new SillyRouteDetails("Admin", "Users"));
-            SillyRouteMap.MapRoute("twovars", "/:controller/:method/{var1}/{var2}", new SillyRouteDetails("Admin", "Index")
-            {
-                { "var1", "herpes" },
-                { "var2", "AIDS" }
-            });
-            SillyRouteMap.MapRoute("admin", "/:controller/:method", new SillyRouteDetails("Admin", "Index"));
+            DispatchTester dispatcher = new DispatchTester();            
 
             List<string> routes = new List<string>()
             {
@@ -101,7 +88,16 @@ namespace system.test
                 "/admin/dashboard",
                 "/admin/users/123/sexdolle",
                 "/admin/dildo/sex/pistol",
-                "/admin/dildo"
+                "/admin/dildo",
+                "/admin/users/456"
+            };
+
+            List<string> invalidRoutes = new List<string>()
+            {
+                "/poop",
+                "/123/annihilation",
+                "/admin/users/123/sexdolle/inyourmouth",
+                "/admin/uppers"
             };
 
             foreach(string route in routes)
@@ -110,7 +106,11 @@ namespace system.test
                 
                 try
                 {
-                    ISillyContent content = SillyRouteMap.Dispatch(route, null);
+                    SillyProxyRequest request = new SillyProxyRequest();
+                    request.path = route;
+                    request.httpMethod = "GET";
+                    SillyProxyContext context = new SillyProxyContext(request);
+                    ISillyContent content = dispatcher.Dispatch(context);
 
                     Console.WriteLine((content == null) ? "null" : content.Content);
 
@@ -122,6 +122,46 @@ namespace system.test
 
                     Assert.True(false);
                 }
+            }
+
+            foreach(string invalid in invalidRoutes)
+            {
+                Console.Write("Dispatch Invalid Route " + invalid + " -> ");
+                
+                try
+                {
+                    SillyProxyRequest request = new SillyProxyRequest();
+                    request.path = invalid;
+                    request.httpMethod = "GET";
+                    SillyProxyContext context = new SillyProxyContext(request);
+                    ISillyContent content = dispatcher.Dispatch(context);
+
+                    Console.WriteLine((content == null) ? "null" : content.Content);
+
+                    Assert.Equal(content, null);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+
+                    Assert.True(false);
+                }
+            }
+        }
+
+        public class DispatchTester : SillyProxyApplication
+        {
+            public DispatchTester()
+                : base()
+            {
+                base.RegisterController("root", typeof(Root));
+                base.RegisterController("admin", typeof(Admin));
+
+                GET("empty", "/", "root", "index");
+                GET("home", "/:method", "root", "index");
+                GET("users", "/admin/users/{var}/{names}", "admin", "Users");
+                GET("twovars", "/:controller/:method/{var1}=herpes/{var2}=AIDS", "admin", "Index");
+                GET("admin", "/:controller/:method", "Admin", "Index");
             }
         }
 

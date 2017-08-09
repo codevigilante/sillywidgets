@@ -5,30 +5,14 @@ using System.Text.RegularExpressions;
 
 namespace SillyWidgets
 {
-    public class SillyRouteDetails : Dictionary<string, object>
-    {
-        public string Controller { get; private set; }
-        public string Method { get; private set; }
-
-        public SillyRouteDetails(string controller = "", string method = "")
-        {
-            Controller = controller;
-            Method = method;
-        }
-
-        public bool HasVariable(string name)
-        {
-            return(ContainsKey(name.ToLower()));
-        }
-    }
-
     public class SillyRoute : List<SillySegment>
     {
         public string Name { get; private set; }
         public string UrlPattern { get; private set; }
         public bool IsValid { get; private set; }
         public string Reason { get; private set; }
-        public SillyRouteDetails Settings { get; private set; }
+        public string Controller { get; private set; }
+        public string Method { get; private set; }
         public int VarCount { get; private set; }
 
         private static Dictionary<string, SegmentTypes> MatchingPatterns = new Dictionary<string, SegmentTypes>()
@@ -36,17 +20,17 @@ namespace SillyWidgets
             { @"^([a-zA-Z\d_\-]+)$", SegmentTypes.HardCoded },
             { @"^(:controller)$", SegmentTypes.Controller },
             { @"^(:method)$", SegmentTypes.Method },
-            { @"^({.+})$", SegmentTypes.Variable }
+            { @"^{.+}(=.*)?$", SegmentTypes.Variable }
         };
 
-        public SillyRoute(string name, string urlPattern, SillyRouteDetails details = null)
+        public SillyRoute(string name, string urlPattern, string controller, string method)
         {
             Name = name;
             UrlPattern = urlPattern;
             IsValid = true;
             VarCount = 0;
-
-            Settings = (details == null) ? new SillyRouteDetails() : details;
+            Controller = controller;
+            Method = method;
 
             ParseUrlPattern();
         }
@@ -160,12 +144,11 @@ namespace SillyWidgets
                         case SegmentTypes.HardCoded:
                             return(new SillyHardCodedSegment(segment));
                         case SegmentTypes.Controller:
-                            return(new SillyControllerSegment(Settings.Controller));                        
+                            return(new SillyControllerSegment(Controller));                        
                         case SegmentTypes.Method:
-                            return(new SillyMethodSegment(Settings.Method));
+                            return(new SillyMethodSegment(Method));
                         case SegmentTypes.Variable:
-                            ++VarCount;
-                            return(new SillyVariableSegment(segment.Trim(new char[] { '{', '}' })));
+                            return(MakeVariable(segment));
                         default:
                             return(null);
                     }
@@ -173,6 +156,29 @@ namespace SillyWidgets
             }
 
             return(null);
+        }
+
+        private SillyVariableSegment MakeVariable(string segment)
+        {
+            ++VarCount;
+
+            string[] parts = segment.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts == null ||
+                parts.Length == 0)
+            {
+                return(null);
+            }
+
+            string name = parts[0].Trim(new char[] { '{', '}' });
+            string defaultVal = string.Empty;
+
+            if (parts.Length == 2)
+            {
+                defaultVal = parts[1].Trim();
+            }
+
+            return(new SillyVariableSegment(name, defaultVal));
         }
 
         private void SetInvalid(string reason)

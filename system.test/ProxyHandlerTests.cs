@@ -6,7 +6,7 @@ namespace system.test
 {
     public class ProxyHandlerTests
     {
-        private readonly SillyProxyHandler handler;
+        private readonly SillyProxyApplication handler;
 
         public ProxyHandlerTests()
         {

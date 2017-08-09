@@ -10,14 +10,14 @@ namespace SillyWidgets.Utilities
 {
     public class SillySiteServer
     {
-        public SillyProxyHandler RequestHandler { get; private set; }
+        public SillyProxyApplication RequestHandler { get; private set; }
         public IPAddress IP { get; private set; }
         public int Port { get; private set; }
 
         private string TestPayload = "<html><body><h1>PLACEHOLDER</h1></body></html>";
         private string Error404 = "<html><body><p>404 - Not Found</p></body></html>";
 
-        public SillySiteServer(SillyProxyHandler requestHandler, int port = 7575, IPAddress ip = null)
+        public SillySiteServer(SillyProxyApplication requestHandler, int port = 7575, IPAddress ip = null)
         {
             this.RequestHandler = requestHandler;
             this.IP = (ip == null) ? IPAddress.Loopback : ip;

@@ -81,7 +81,9 @@ namespace SillyWidgets
 
     public class SillyVariableSegment : SillySegment
     {
-        public SillyVariableSegment(string name)
+        public string Default { get; private set; }
+        
+        public SillyVariableSegment(string name, string defaultValue)
             : base(name, SegmentTypes.Variable)
         {
         }
@@ -89,6 +91,11 @@ namespace SillyWidgets
         public override void Visit(ISillySegmentVisitor visitor)
         {
             visitor.VisitVariable(this);
+        }
+
+        public bool DefaultExists()
+        {
+            return(String.IsNullOrEmpty(Default));
         }
 
         private string StripBraces(string name)
