@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\system\sillywidgets.csproj" />
+    <ProjectReference Include="..\system.samples\system.samples.csproj" />
   </ItemGroup>
 
 </Project>

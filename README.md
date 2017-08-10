@@ -22,7 +22,6 @@ Subclass `SillyProxyHandler`. `SillyProxyHandler` has a method named `Handle()` 
 
 # todo
 
-* move samples out of system and make it its own project, because it adds to the bloat
-* add functionality in SillyController to pull from S3 and CRUD from an RDS database, asynchronously
+* getting and processing views (S3) with data (RDS database)
 * figure out how to deal with views
 * figure out how to deal with database stuff
