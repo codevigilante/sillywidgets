@@ -54,7 +54,7 @@ namespace SillyWidgets
             return(route);
         }
 
-        public ISillyContent Dispatch(ISillyContext context)
+        public ISillyView Dispatch(ISillyContext context)
         {
             if (context == null ||
                 context.HttpMethod == SupportedHttpMethods.Unsupported)
@@ -114,7 +114,7 @@ namespace SillyWidgets
 
                     object controllerTarget = Activator.CreateInstance(visitor.Controller);
 
-                    return(visitor.Method.Invoke(controllerTarget, vars) as ISillyContent);
+                    return(visitor.Method.Invoke(controllerTarget, vars) as ISillyView);
                 }
             }
 

@@ -178,7 +178,7 @@ namespace SillyWidgets
             IEnumerable<MethodInfo> methods = candidateMethods.Where
             (
                 m => String.Compare(m.Name, name, true) == 0 &&
-                        m.ReturnType.IsAssignableFrom(typeof(ISillyContent)) &&
+                        m.ReturnType.IsAssignableFrom(typeof(ISillyView)) &&
                         m.GetParameters().Length == varCount &&
                         m.GetParameters()[0].ParameterType == typeof(ISillyContext)
             );

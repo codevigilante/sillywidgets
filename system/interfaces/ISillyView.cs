@@ -4,7 +4,7 @@ namespace SillyWidgets
 {
     public enum SillyContentType { Html, Json }
 
-    public interface ISillyContent
+    public interface ISillyView
     {
         SillyContentType ContentType { get; set; }
         string Content { get; set; }        

@@ -110,7 +110,7 @@ namespace system.test
                     request.path = route;
                     request.httpMethod = "GET";
                     SillyProxyContext context = new SillyProxyContext(request);
-                    ISillyContent content = dispatcher.Dispatch(context);
+                    ISillyView content = dispatcher.Dispatch(context);
 
                     Console.WriteLine((content == null) ? "null" : content.Content);
 
@@ -134,7 +134,7 @@ namespace system.test
                     request.path = invalid;
                     request.httpMethod = "GET";
                     SillyProxyContext context = new SillyProxyContext(request);
-                    ISillyContent content = dispatcher.Dispatch(context);
+                    ISillyView content = dispatcher.Dispatch(context);
 
                     Console.WriteLine((content == null) ? "null" : content.Content);
 
@@ -171,36 +171,36 @@ namespace system.test
             {          
             }
 
-            public ISillyContent Index(ISillyContext context)
+            public ISillyView Index(ISillyContext context)
             {
-                ISillyContent content = new SillyContent();
+                ISillyView content = new SillyView();
 
                 content.Content = "<h1>Root.Index</h1>";
 
                 return(content);
             }
 
-            public ISillyContent About(ISillyContext context)
+            public ISillyView About(ISillyContext context)
             {
-                ISillyContent content = new SillyContent();
+                ISillyView content = new SillyView();
 
                 content.Content = "<h1>Root.About</h1>";
 
                 return(content);
             }
 
-            public ISillyContent Content(ISillyContext context)
+            public ISillyView Content(ISillyContext context)
             {
-                ISillyContent content = new SillyContent();
+                ISillyView content = new SillyView();
 
                 content.Content = "<h1>Root.Content</h1>";
 
                 return(content);
             }
 
-            public ISillyContent SexTaco(ISillyContext context)
+            public ISillyView SexTaco(ISillyContext context)
             {
-                ISillyContent content = new SillyContent();
+                ISillyView content = new SillyView();
 
                 content.Content = "<h1>Root.SexTaco</h1>";
 
@@ -214,36 +214,36 @@ namespace system.test
             {
             }
 
-            public ISillyContent Index(ISillyContext context)
+            public ISillyView Index(ISillyContext context)
             {
-                ISillyContent content = new SillyContent();
+                ISillyView content = new SillyView();
 
                 content.Content = "<h1>Admin.Index</h1>";
 
                 return(content);
             }
 
-            public ISillyContent Dashboard(ISillyContext context)
+            public ISillyView Dashboard(ISillyContext context)
             {
-                ISillyContent content = new SillyContent();
+                ISillyView content = new SillyView();
 
                 content.Content = "<h1>Admin.Dashboard</h1>";
 
                 return(content);
             }
 
-            public ISillyContent Users(ISillyContext context, object var, object names)
+            public ISillyView Users(ISillyContext context, object var, object names)
             {
-                ISillyContent content = new SillyContent();
+                ISillyView content = new SillyView();
 
                 content.Content = "<h1>Admin.Users(v1, v2)</h1>";
 
                 return(content);
             }
 
-            public ISillyContent Dildo(ISillyContext context, object var, object var2)
+            public ISillyView Dildo(ISillyContext context, object var, object var2)
             {
-                ISillyContent content = new SillyContent();
+                ISillyView content = new SillyView();
 
                 content.Content = "<h1>Admin.Dildo(v1, v2)</h1>";
 

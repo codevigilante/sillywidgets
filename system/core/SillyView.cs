@@ -2,12 +2,12 @@ using System;
 
 namespace SillyWidgets
 {
-    public class SillyContent : ISillyContent
+    public class SillyView : ISillyView
     {
         public SillyContentType ContentType { get; set; }
         public string Content { get; set; }
 
-        public SillyContent()
+        public SillyView()
         {
             ContentType = SillyContentType.Html;
             Content = string.Empty;

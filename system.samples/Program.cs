@@ -12,12 +12,10 @@ namespace system.serve
     class Program
     {
         static string BUCKET_NAME = "awsnetcore.com";
-        static string AccessKey = "AKIAJLECGMENALAF7P6A";
-        static string SecretKey = "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";
-
+        
         static void Main(string[] args)
         {
-            try
+            /*try
             {
                 Console.WriteLine("Bucket " + BUCKET_NAME + " Objects:");
 
@@ -41,7 +39,7 @@ namespace system.serve
             catch (Exception ex)
             {
                 Console.WriteLine("Exception: " + ex.Message);
-            }
+            }*/
             
 
             SillySite site = new SillySite();

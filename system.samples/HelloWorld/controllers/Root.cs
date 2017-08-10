@@ -2,7 +2,7 @@ using System;
 
 namespace SillyWidgets.Samples
 {
-    public class Root : AbstractSillyController
+    public class Root : SillyController
     {
         public Root()
             : base()
@@ -10,11 +10,11 @@ namespace SillyWidgets.Samples
 
         }
 
-        public ISillyContent Index(ISillyContext context)
+        public ISillyView Index(ISillyContext context)
         {
-            SillyContent content = new SillyContent();
+            SillyView content = new SillyView();
 
-            content.Content = "<h1>Silly Site</h1><h3>Root.Index</h3>";
+            content.Content = "<h1>Hello World</h1><h3>I'm Root.Index</h3>";
 
             return(content);
         }

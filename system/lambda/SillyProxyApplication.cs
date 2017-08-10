@@ -38,7 +38,7 @@ namespace SillyWidgets
                 }
             
                 ISillyContext sillyContext = CreateContext(input);                
-                ISillyContent sillyContent = Dispatch(sillyContext);
+                ISillyView sillyContent = Dispatch(sillyContext);
 
                 if (sillyContent == null)
                 {
