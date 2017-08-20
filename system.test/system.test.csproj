@@ -15,4 +15,8 @@
     <ProjectReference Include="..\system.samples\system.samples.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <None Update="./testdata/simple.html" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

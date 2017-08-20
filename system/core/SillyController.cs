@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace SillyWidgets
 {
@@ -9,9 +10,19 @@ namespace SillyWidgets
         {
         }
 
-        public T LoadView<T>(string filename) where T : ISillyView
+        public T LoadViewAsync<T>() where T : ISillyView
         {
             return(default(T));
+        }
+
+        public ISillyView LoadViewAsync(SillyResource viewFile, List<SillyResource> widgetFiles)
+        {
+            return(null);
+        }
+
+        public void LoadData()
+        {
+            
         }
     }
 }

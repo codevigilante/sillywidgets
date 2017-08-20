@@ -165,7 +165,7 @@ namespace system.test
             }
         }
 
-        public class Root : AbstractSillyController
+        public class Root : SillyController
         {
             public Root()
             {          
@@ -208,7 +208,7 @@ namespace system.test
             }
         }
 
-        public class Admin : AbstractSillyController
+        public class Admin : SillyController
         {
             public Admin()
             {

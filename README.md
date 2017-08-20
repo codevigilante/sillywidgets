@@ -22,6 +22,14 @@ Subclass `SillyProxyHandler`. `SillyProxyHandler` has a method named `Handle()` 
 
 # todo
 
-* getting and processing views (S3) with data (RDS database)
+* build lightening fast HTML parser
+* getting and processing views (S3) with data
+* update namespaces
+* database interface (RDS)
 * figure out how to deal with views
 * figure out how to deal with database stuff
+
+# Spinoffs
+
+* Codeless - genericize the controller and view to allow users to accomplish everything in the HTML without having to write any code
+* SillyBlog - a derived blog engine

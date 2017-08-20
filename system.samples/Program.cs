@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using SillyWidgets;
 using SillyWidgets.Utilities;
@@ -12,6 +13,8 @@ namespace system.serve
     class Program
     {
         static string BUCKET_NAME = "awsnetcore.com";
+        const string HELP = "--info";
+        const string HELLOWORLD = "helloworld";
         
         static void Main(string[] args)
         {
@@ -40,15 +43,61 @@ namespace system.serve
             {
                 Console.WriteLine("Exception: " + ex.Message);
             }*/
-            
 
-            SillySite site = new SillySite();
+            string command = string.Empty;
+
+            if (args.Length > 0)
+            {
+                command = args[0];
+            }            
+
+            SillyProxyApplication site = CreateSite(command);
+
+            if(site == null)
+            {
+                Console.WriteLine("");
+                Console.WriteLine("Done");
+
+                return;
+            }
 
             SillySiteServer testServer = new SillySiteServer(site);
 
             Task server = testServer.Start();
 
             server.Wait(); 
+        }
+
+        private static SillyProxyApplication CreateSite(string command)
+        {
+            SillyProxyApplication site = null;
+
+            switch(command.ToLower())
+            {
+                case HELP:
+                    PrintHelp();
+                    break;
+                case HELLOWORLD:
+                default:
+                    site = new HelloWorld();
+
+                    Console.WriteLine("Launching HelloWorld");
+
+                    break;
+            }
+
+            return(site);
+        }
+
+        private static void PrintHelp()
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Usage: silly [application]");
+            Console.ResetColor();
+            Console.WriteLine("Where application is...");
+            Console.WriteLine("");
+            Console.WriteLine("{0,-15} {1,-40}", HELP, "this");
+            Console.WriteLine("{0,-15} {1,-40}", HELLOWORLD, "Simple Hello World app");
         }
     }
 }

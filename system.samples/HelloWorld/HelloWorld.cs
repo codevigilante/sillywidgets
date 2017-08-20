@@ -2,9 +2,9 @@
 
 namespace SillyWidgets.Samples
 {
-    public class SillySite : SillyProxyApplication
+    public class HelloWorld : SillyProxyApplication
     {
-        public SillySite()
+        public HelloWorld()
             : base()
         {
             base.RegisterController("root", typeof(Root));

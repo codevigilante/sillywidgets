@@ -10,7 +10,7 @@ namespace system.test
 
         public ProxyHandlerTests()
         {
-            handler = new SillySite();
+            handler = new HelloWorld();
         }
 
         [Fact]
