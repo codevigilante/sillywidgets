@@ -5,6 +5,8 @@ namespace SillyWidgets.Gizmos
 {
     public class HtmlGizmo
     {
+        private HtmlLexerGizmo Lexer = null;
+
         public HtmlGizmo()
         {
         }
@@ -22,12 +24,12 @@ namespace SillyWidgets.Gizmos
                 return(true);
             }
 
-            HtmlLexerGizmo lexer = new HtmlLexerGizmo(ProcessToken);
+            Lexer = new HtmlLexerGizmo(ProcessToken);
 
             try
             {   
                 Console.WriteLine("Lexing...");
-                lexer.Lex(htmlData);
+                Lexer.Gimme(htmlData);
             }
             catch(Exception ex)
             {

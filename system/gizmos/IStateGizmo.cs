@@ -12,6 +12,7 @@ namespace SillyWidgets.Gizmos
 
     public interface IStateGizmo<I, C>
     {
+        void Enter(I input);
         void Accept(I input, C context);
         void End(C context);
     }

@@ -17,6 +17,7 @@
 
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <None Update="./testdata/simple.html" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="./testdata/google.html" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
