@@ -18,19 +18,19 @@ namespace system.test
         {
             HtmlGizmo html = new HtmlGizmo();
 
+            Console.WriteLine("Lexing...");
+
             FileStream fileStream = new FileStream("testdata/simple.html", FileMode.Open);
 
             using (StreamReader reader = new StreamReader(fileStream))
             {
-                Console.WriteLine("simple.html...");
+                Console.Write("simple.html...");
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
                 bool success = html.Load(reader);
                 timer.Stop();
 
-                Console.WriteLine("Lex time: " + timer.ElapsedMilliseconds);
-                Console.WriteLine();
-                Console.WriteLine();
+                Console.WriteLine("Lex time: " + timer.ElapsedMilliseconds + "ms");
 
                 Assert.True(success);
             }
@@ -39,18 +39,18 @@ namespace system.test
 
             using (StreamReader reader = new StreamReader(fileStream))
             {
-                Console.WriteLine("google.html...");
+                Console.Write("google.html...");
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
                 bool success = html.Load(reader);
                 timer.Stop();
 
-                Console.WriteLine("Lex time: " + timer.ElapsedMilliseconds);
-                Console.WriteLine();
-                Console.WriteLine();
+                Console.WriteLine("Lex time: " + timer.ElapsedMilliseconds + "ms");
 
                 Assert.True(success);
             }*/
+
+            Console.WriteLine();
         }
     }
 }

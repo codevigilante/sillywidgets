@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace SillyWidgets.Gizmos
 {
-    public enum TokenType { Invalid, BeginDoc, Doctype, EndDoc, MarkupDecl, MarkupName, OpenTag, EndTag, TagName, CloseTag, SelfCloseTag, Code, BeginComment, EndComment,
+    public enum TokenType { Invalid, BeginDoc, Doctype, EndDoc, MarkupDecl, OpenTag, EndTag, TagName, CloseTag, SelfCloseTag, Code, BeginComment, EndComment,
                             EndCode, Text, AttributeName, AttributeValue };
     public delegate void TokenAvailable(Token token);
 
@@ -35,9 +35,6 @@ namespace SillyWidgets.Gizmos
         {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', ':', '.', '-', '_'
         };
-        
-        /*private enum Modes { Script, None }
-        private Modes Mode = Modes.None;*/
         
         public HtmlLexerGizmo(TokenAvailable tokenCallback)
         {
@@ -132,6 +129,11 @@ namespace SillyWidgets.Gizmos
                         }
 
                         Attributes(tagEnd);
+
+                        if (isScript)
+                        {
+                            Code();
+                        }
 
                         isContent = true;
 
