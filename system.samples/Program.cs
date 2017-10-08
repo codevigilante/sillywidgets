@@ -12,7 +12,6 @@ namespace system.serve
 {
     class Program
     {
-        static string BUCKET_NAME = "awsnetcore.com";
         const string HELP = "--info";
         const string HELLOWORLD = "helloworld";
         

@@ -1,16 +1,31 @@
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.IO;
+using SillyWidgets.Gizmos;
 
 namespace SillyWidgets
 {
     public class SillyView : ISillyView
     {
         public SillyContentType ContentType { get; set; }
-        public string Content { get; set; }
-        public SillyResource ViewFile { get; set; }
-        public List<SillyResource> WidgetFiles { get; private set; }
-        //Dictionary<string, SillyWidget> Widgets { get; }
+        public string Content
+        { 
+            get
+            {
+                if (String.IsNullOrEmpty(_content))
+                {
+                    return(Render());
+                }
+
+                return(_content);
+            } 
+            set
+            {
+                _content = value;
+            }
+        }
+        private string _content = string.Empty;
+
+        private HtmlGizmo Html = null;
 
         public SillyView()
         {
@@ -18,14 +33,28 @@ namespace SillyWidgets
             Content = string.Empty;
         }
 
-        public async Task<bool> Load()
+        public void Load(StreamReader data)
         {
-            return(false);
+            Html = new HtmlGizmo();
+            bool success = Html.Load(data);
+
+            if (!success)
+            {
+                throw new Exception("Parsing HTML: " + Html.ParseError);
+            }
         }
 
-        public bool BindText(string name, string value)
+        public string Render()
         {
-            return(true);
+            if (Html == null)
+            {
+                return(_content);
+            }
+
+            _content = Html.Payload();
+            
+            return(_content);
         }
+
     }
 }

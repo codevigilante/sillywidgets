@@ -13,7 +13,7 @@ namespace system.test
         {
             route = null;
         }
-/*
+
         [Fact]
         public void ValidRouteTests()
         {
@@ -250,6 +250,5 @@ namespace system.test
                 return(content);
             }
         }
-*/
     }
 }

@@ -33,7 +33,7 @@ namespace SillyWidgets.Utilities
                 throw new Exception("Cannot start server, SillyProxyHandler cannot be null");
             }
 
-            Console.WriteLine("Starting build server on " + IP.ToString() + ":" + Port);
+            Console.WriteLine("Starting build server on " + IP.ToString() + ":" + Port + ":" + Directory.GetCurrentDirectory());
 
             Listener = new TcpListener(IP, Port);
 
@@ -80,13 +80,39 @@ namespace SillyWidgets.Utilities
                             continue;
                         }
 
-                        consoleStr += request.Method + " " + request.URL + " " + request.Version + " : PROXY " + request.httpMethod + " " + request.path + " " + request.QueryToString();
+                        consoleStr += request.Method + " " + request.URL + " " + request.Version;// + " : PROXY " + request.httpMethod + " " + request.path + " " + request.QueryToString();
+
+                        string normalizedRequest = Directory.GetCurrentDirectory() + request.URL.Trim().ToLower();
 
                         // figure out if request should be proxied or not. Probably be configurable by the user sometime in the future.
 
-                        TestLambdaContext lambdaContext = new TestLambdaContext();
+                        if (!File.Exists(normalizedRequest))
+                        {
+                            consoleStr += " : PROXY " + request.httpMethod + " " + request.path + " " + request.QueryToString();
 
-                        response.ProxyResponse = RequestHandler.Handle(request, lambdaContext);
+                            TestLambdaContext lambdaContext = new TestLambdaContext();
+
+                            response.ProxyResponse = RequestHandler.Handle(request, lambdaContext);
+                        }
+                        else
+                        {
+                            FileInfo requestedFile = new FileInfo(normalizedRequest);
+                            SillyResource resource = new SillyResource(requestedFile);
+
+                            response.Payload = resource.Contents();
+
+                            switch(resource.Type)
+                            {
+                                case SillyResource.Types.CSS:
+                                    response.ProxyResponse.headers.ContentType = SillyMimeType.TextCss;
+                                    break;
+                                case SillyResource.Types.JS:
+                                    response.ProxyResponse.headers.ContentType = SillyMimeType.ApplicationJavascript;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
 
                         consoleStr += " RESOLVED ";
                     }

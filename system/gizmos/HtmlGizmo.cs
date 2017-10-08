@@ -1,35 +1,41 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SillyWidgets.Gizmos
 {
     public class HtmlGizmo
     {
+        public string ParseError { get; private set; }
+
         private HtmlLexerGizmo Lexer = null;
         private HtmlStateMachine StateMachine = null;
         private ElementNode DocRoot = null;
 
         public HtmlGizmo()
         {
+            ParseError = string.Empty;
         }
 
         public bool Load(TextReader htmlData)
         {
             if (htmlData == null)
             {
+                ParseError = "HTML data is NULL";
+
                 return(false);
             }
 
             if (htmlData.Peek() < 0)
             {
-                // this is fine, just create an empty doc tree
+                DocRoot = new ElementNode("root");
+
                 return(true);
             }
 
             Lexer = new HtmlLexerGizmo(ProcessToken);
             StateMachine = new HtmlStateMachine();
-
             bool ok = true;
 
             try
@@ -38,16 +44,33 @@ namespace SillyWidgets.Gizmos
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Error parsing HTML: " + ex.Message);
-
                 ok = false;
+                ParseError = ex.Message;
             }
 
             DocRoot = StateMachine.TreeBuilder.Root;
-            //Console.WriteLine();
-            //DocRoot.Print("", true);
 
             return(ok);
+        }
+
+        public string Payload()
+        {
+            if (DocRoot == null)
+            {
+                return(string.Empty);
+            }
+
+            HtmlPayloadVisitor payloadCreator = new HtmlPayloadVisitor();
+
+            if (DocRoot.GetChildren().Count > 0)
+            {
+                foreach(TreeNodeGizmo child in DocRoot.GetChildren())
+                {
+                    payloadCreator.Go(child);
+                }
+            }
+
+            return(payloadCreator.Payload.ToString());
         }
 
         private void ProcessToken(Token token)

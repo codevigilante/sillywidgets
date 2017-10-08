@@ -12,11 +12,5 @@ namespace SillyWidgets
         SillyContentType ContentType { get; set; }
         string Content { get; set; }        
         /********************************************************************************* */
-
-        SillyResource ViewFile { get; }
-        List<SillyResource> WidgetFiles { get; }
-        //Dictionary<string, SillyWidget> Widgets { get; }
-
-        Task<bool> Load();
     }
 }

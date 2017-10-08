@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SillyWidgets.Gizmos
 {
@@ -20,18 +21,21 @@ namespace SillyWidgets.Gizmos
             Parent = null;
         }
 
+        public abstract List<TreeNodeGizmo> GetChildren();
         public abstract void Accept(IVisitor visitor);
         public abstract void Print(string indent, bool last);
+        //public abstract string 
     }
 
     public class ElementNode : TreeNodeGizmo
     {
         private List<TreeNodeGizmo> Children = new List<TreeNodeGizmo>();
-        private Dictionary<string, string> Attributes = new Dictionary<string, string>();
+        public Dictionary<string, string> Attributes { get; private set; }
 
         public ElementNode(string name)
             : base(name)
         {            
+            Attributes = new Dictionary<string, string>();
         }
 
         public override void Accept(IVisitor visitor)
@@ -45,7 +49,7 @@ namespace SillyWidgets.Gizmos
             Children.Add(node);
         }
 
-        public List<TreeNodeGizmo> GetChildren()
+        public override List<TreeNodeGizmo> GetChildren()
         {
             return(Children);
         }
@@ -54,6 +58,25 @@ namespace SillyWidgets.Gizmos
         {
             Attributes[name.ToLower()] = value;
         }
+
+        public string GetAttribute(string name)
+        {
+            string val = string.Empty;
+
+            Attributes.TryGetValue(name.ToLower(), out val);
+
+            return(val);
+        }
+
+        /*public override string ToHtmlElement()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.Append("<");
+            builder.Append(Name);
+            builder.Append(">");
+
+            return("<" + Name + ">");
+        }*/
 
         public override void Print(string indent, bool last)
         {
@@ -87,6 +110,11 @@ namespace SillyWidgets.Gizmos
             : base("text")
         {            
             Text = text;
+        }
+
+        public override List<TreeNodeGizmo> GetChildren()
+        {
+            return (new List<TreeNodeGizmo>());
         }
 
         public override void Accept(IVisitor visitor)

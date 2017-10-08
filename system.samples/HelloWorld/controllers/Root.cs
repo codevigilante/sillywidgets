@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.IO;
 
 namespace SillyWidgets.Samples
 {
@@ -13,38 +15,13 @@ namespace SillyWidgets.Samples
 
         public ISillyView Index(ISillyContext context)
         {
-            // base.LoadDataAsync() : Data
-            // Home view = LoadViewAsync<Home>();
-            // Data.wait();
-            // view.wait();
-            // view.BindModel(Data);
-            Home content = new Home();
+            SillyView home = base.LoadView(@"HelloWorld/Views/index.html");
+            
+            // view.Bind("name", value);
+            // view.Bind("name2", value2);
 
-            content.Content = "<h1>Hello World</h1><h3>I'm Root.Index</h3>";
-
-            return(content);
+            return(home);
         }
         
-    }
-
-    public class Home : SillyView
-    {
-        /*public string Title { get; set; }
-        public string Sub { get; set; }
-        public object Sample { get; set; }*/
-
-        public Home()
-            //: base("views/home.html", new List<string> { "widgets/sample.html" })
-        {
-            /*Title = "This is a title";
-            Sub = "This is a sub";
-            Sample = null;*/
-        }
-
-        public void BindModel(object Data)
-        {
-            // base.BindText("title", Data.title);
-            
-        }
     }
 }

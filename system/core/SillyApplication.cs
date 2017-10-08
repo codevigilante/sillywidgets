@@ -114,7 +114,16 @@ namespace SillyWidgets
 
                     object controllerTarget = Activator.CreateInstance(visitor.Controller);
 
-                    return(visitor.Method.Invoke(controllerTarget, vars) as ISillyView);
+                    try
+                    {
+                        ISillyView view = visitor.Method.Invoke(controllerTarget, vars) as ISillyView;
+
+                        return(view);
+                    }
+                    catch(Exception ex)
+                    {
+                        throw ex.InnerException;
+                    }
                 }
             }
 

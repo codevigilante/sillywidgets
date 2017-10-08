@@ -27,11 +27,6 @@ namespace SillyWidgets
         {
             try
             {
-                /*if (SillyRouteMap.RouteCount() == 0)
-                {
-                    throw new SillyException(SillyHttpStatusCode.NotImplemented, "This site isn't configured for prime time just yet. Please try again later");
-                }*/
-
                 if (input == null)
                 {
                     throw new SillyException(SillyHttpStatusCode.ServerError, "Request aborted upon delivery.");
@@ -49,7 +44,6 @@ namespace SillyWidgets
 
                 SillyProxyResponse response = new SillyProxyResponse();
                 response.body = sillyContent.Content;
-                //response.headers.ContentType = sillyContext.ContentType;
 
                 return(response);
             }

@@ -18,37 +18,35 @@ namespace system.test
         {
             HtmlGizmo html = new HtmlGizmo();
 
-            Console.WriteLine("Lexing...");
-
             FileStream fileStream = new FileStream("testdata/simple.html", FileMode.Open);
 
             using (StreamReader reader = new StreamReader(fileStream))
             {
-                Console.Write("simple.html...");
+                Console.Write("Parsing simple.html...");
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
                 bool success = html.Load(reader);
                 timer.Stop();
 
-                Console.WriteLine("Lex time: " + timer.ElapsedMilliseconds + "ms");
+                Console.WriteLine("Parse time: " + timer.ElapsedMilliseconds + "ms");
 
                 Assert.True(success);
             }
 
-            /*fileStream = new FileStream("testdata/google.html", FileMode.Open);
+            fileStream = new FileStream("testdata/google.html", FileMode.Open);
 
             using (StreamReader reader = new StreamReader(fileStream))
             {
-                Console.Write("google.html...");
+                Console.Write("Parsing google.html...");
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
                 bool success = html.Load(reader);
                 timer.Stop();
 
-                Console.WriteLine("Lex time: " + timer.ElapsedMilliseconds + "ms");
+                Console.WriteLine("Parse time: " + timer.ElapsedMilliseconds + "ms");
 
                 Assert.True(success);
-            }*/
+            }
 
             Console.WriteLine();
         }
