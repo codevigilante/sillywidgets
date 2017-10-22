@@ -22,11 +22,12 @@ Subclass `SillyProxyHandler`. `SillyProxyHandler` has a method named `Handle()` 
 
 # todo
 
-* build lightening fast HTML parser
+* make release v0.3
+* Build and launch sillywidgets.com placeholder
+* v0.4
 * getting and processing views (S3) with data
 * update namespaces
 * database interface (RDS)
-* figure out how to deal with views
 * figure out how to deal with database stuff
 
 # Spinoffs

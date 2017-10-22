@@ -8,17 +8,21 @@ namespace SillyWidgets.Gizmos
     {
         void VisitElement(ElementNode node);
         void VisitText(TextNode node);
+        void Go(TreeNodeGizmo node);
     }
 
     public abstract class TreeNodeGizmo
     {
         public TreeNodeGizmo Parent { get; set; }
         public string Name { get; set; }
+        public bool HasCloseTag { get; set; }
+        public bool SelfCloseTag { get; set; }
 
         public TreeNodeGizmo(string name)
         {
             Name = name;
             Parent = null;
+            HasCloseTag = SelfCloseTag = false;
         }
 
         public abstract List<TreeNodeGizmo> GetChildren();
@@ -52,6 +56,11 @@ namespace SillyWidgets.Gizmos
         public override List<TreeNodeGizmo> GetChildren()
         {
             return(Children);
+        }
+
+        public void DeleteChildren()
+        {
+            Children.Clear();
         }
 
         public void SetAttribute(string name, string value)

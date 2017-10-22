@@ -53,7 +53,7 @@ namespace SillyWidgets
             }
             catch (Exception Ex)
             {
-                return(buildErrorResponse(SillyHttpStatusCode.ServerError, Ex.Message));
+                return(buildErrorResponse(SillyHttpStatusCode.ServerError, Ex.Message + "\n" + Ex.StackTrace));
             }
         }
 
