@@ -1,72 +1,48 @@
-# sillywidgets v0.1
+# sillywidgets v0.3
 
-An atypical static site generator built using .NET Core 1.1. For Mac and Windows.
+Silly Widgets is a C# .NET Core web framework for AWS Lambda. <Insert punchline here>  
 
 # synopsis
 
-Silly Widgets is a static site generator for making client heavy web apps. It uses the concept of widgets, which are bits of reusable HTML to construct complex web sites.
+Silly Widgets is a C# web framework, using .NET Core, that runs on Amazon's Lambda platform. Its goals are:  
 
-# installing
-
-## on Mac (OSx 10.11 and above)
-
-1. Download the Mac archive from [sillywidgets.com/mac](http://sillywidgets.com/mac).
-1. Unzip it to a reasonable location.
-1. In Terminal, go to the directory where you unzipped the archive.
-1. Run `chmod +x ./install.sh`
-1. Then run `./install.sh`
-1. Enjoy!
-
-Silly Widgets installs to your `/usr/local/lib` directory and creates a link in `/usr/local/bin` to the `silly` executable. This allows you to enjoy `silly` from wherever you like to develop.
-
-## on Windows (8.1 and beyond)
-
-1. Download the Windows archive from [sillywidgets.com/win](http://sillywidgets.com/win)
-1. Unzip it to a reasonable location.
-1. Enjoy!
-
-To make it easier to run the `silly` command, append the directory where the archive was unzipped to the PATH environment variable.
-
-## build from source
-
-1. Download dotnet CLI tools from [here](https://www.microsoft.com/net/core)
-1. `git clone https://github.com/codevigilante/sillywidgets.git`
-1. `cd` into silly directory
-1. `dotnet build` builds the app, duh
-1. `dotnet publish -c Release -r osx.10.11-x64` packages the app for deployment to a specific target, in this case, MacOS 10.11 x64
-
-There's also scripts to publish to specific platforms. Such as `publish_mac_10.11.sh` Give one of them a shot if you're feeling lazy.
-
-# usage
-
-`silly new [-location <path/to/route/directory>] [-name <site-name>]` - Initialize a new silly site:
+1. Make it easy, cheap, and fast to get a site up and going. This is relative; configuring Amazon can be a bitch. But this is more from a coding standpoint than an infrastructure one.  
+1. Cheaper hosting costs for small to medium sites, because Lambda is charged only for actual running time* and not by the second even if it's not doing anything.  
+1. Fast and small, get in, get out, don't try to be everything. Because this aligns well with goal A. Purge the unnecessary, optimize the most used.   
   
-* `<directory>`
-	* widgets
-        * hello.html
-    * routes
-        * index.html 
-    * `<directory>`.json
+Silly Widgets is really about how A-ron would like to build sites. And since A-ron doesn't like paying bills for things he's not using, he decided to build this thing trying to take the best parts of other frameworks he's used, like Codeigniter, Wicket, ASP.NET, and Struts. And since he loves** .NET C#, why not?  
 
-`silly compile [-location <path/to/route/directory>]` - Checks the silly site for errors, ensuring widgets referenced exist and all assets are accounted for.  
+Referring to myself in third person feels like an out of body experience. I'm so turned on by me.
 
-`silly build [-location <path/to/route/directory>]` - Compiles the silly site and starts a development HTTP server.   
-  
-`silly deploy [-location <path/to/route/directory>]` - Compile and package the silly site for deployment    
-  
-# rules  
+\* This is Amazon's claim, not mine. Who knows if they're juicing the gas or adding a little "extra" here and there. Trust, I guess, until some really smart fucker gets pissed off enough to pull the curtains back. And you know that's how Amazon is going to crumble. One disgruntled asshole exposing all their dirty secrets.
 
-* Widgets cannot reference other widgets
-* Routes can reference widgets only
-* The directory structure of routes will be the exact same structure that's built
+** "Love" is a strong word here. It's not like I'm jacking off to .NET C# or pretending it's my girlfriend or anything. Pfff, I'm totally not a weirdo.
 
-# issues
+# getting it
 
-* in build mode, if a new widget is added, it's necessary to restart the build server.
+# using it
 
-# the future
+Subclass `SillyProxyHandler`. `SillyProxyHandler` has a method named `Handle()` which is designed to take proxied requests from API Gateway and respond with HTML or JSON.  
 
-* figure out how to pass in and resolve variables, like {{version}}
-    * extend this to more complex things like collections and "classes" of data
-* create install command line option
-* integrate with AWS S3 to easily upload deployment
+More stuff on the way.  
+
+# todo
+
+* make release v0.3
+* Build and launch sillywidgets.com placeholder
+* v0.4
+* update namespaces
+* getting and processing views from S3
+* dealing with widgets
+* make release v0.4
+* update sillywidgets.com
+* v0.5
+* database operations (RDS)
+* binding database data to views
+* make release v0.5
+* update sillywidgets.com
+
+# Spinoffs
+
+* Codeless - genericize the controller and view to allow users to accomplish everything in the HTML without having to write any code
+* SillyBlog - a derived blog engine
