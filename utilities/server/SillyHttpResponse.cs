@@ -3,7 +3,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.Net.Http;
 
-namespace SillyWidgets.Utilities
+namespace SillyWidgets.Utilities.Server
 {
     public class SillyHttpResponse
     {

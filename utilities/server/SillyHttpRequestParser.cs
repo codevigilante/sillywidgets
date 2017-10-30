@@ -3,7 +3,7 @@ using System.Net.Http.Headers;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace SillyWidgets.Utilities
+namespace SillyWidgets.Utilities.Server
 {
     public class SillyHttpRequestParser : SillyProxyRequest
     {
