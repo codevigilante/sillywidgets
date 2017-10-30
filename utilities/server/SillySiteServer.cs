@@ -6,7 +6,7 @@ using System.Text;
 using System.IO;
 using Amazon.Lambda.TestUtilities;
 
-namespace SillyWidgets.Utilities
+namespace SillyWidgets.Utilities.Server
 {
     public class SillySiteServer
     {
