@@ -28,6 +28,22 @@ Include in your `.csproj` file:
 
 # ideal development workflow
 
+## AWS Nonsense
+
+### Credentials & Roles & All That Shit
+
+**Don't be lazy about this stuff, like me, and find out the hard way that there are a plethora of ne'er do wells out there with nothing better to do than take advantage of your (my) laziness. This is a one time pain in the ass that will only require management moving forward.**
+
+The very first thing you should do is download the [AWS Command Line Interface](https://aws.amazon.com/cli/). This will help you manage all things AWS from the command line. But mainly pushing static content to S3, which is where Silly Widgets prefers to pull views from.
+
+The very second thing you should do is create an IAM user with access to S3, and any other AWS services you'll be using. Then, create an access key for this user to make local development easier/possible, and to allow you to access your S3 resources from the command line. Once you've created an access key, you can add it to the AWS local store by running `aws configure` which will ask you for the things it wants. DON'T USE YOUR ROOT/GOD/ALL ACCESS ALL THE TIME/WHATEVER USER FOR THIS PURPOSE!!
+
+PLEASE DO NOT PUBLISH YOUR ACCESS KEYS. THIS INCLUDES PUSHING THEM TO A PUBLIC (OR PRIVATE, REALLY) CODE REPOSITORY. Github will let you know if you've done this by accident. I'm not sure about the others, but they don't really matter, do they?
+
+The very third thing you should do is create an IAM Role for your lambda function. This role should provide full access to S3 and any other services your lambda function will use, but only those services and nothing else. This will be the role you assign your lambda function when you're ready to set it up.
+
+## local development
+
 Create a directory structure that looks like this:  
   
 * `<your-site-name>`
@@ -108,23 +124,25 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 # todo
 
 * v0.4
-* Add support for reading from S3 and make this the standard way of handling static resources
+* split repositories into separate projects
 * Build and launch sillywidgets.com placeholder
-* v0.4
+* v0.5
 * transition to netcoreapp2.0
 * make dealing with local views and resources (like css) better (seamless)
 * update namespaces
 * getting and processing views from S3
 * dealing with widgets
-* make release v0.4
-* update sillywidgets.com
-* v0.5
-* database operations (RDS)
-* binding database data to views
 * make release v0.5
 * update sillywidgets.com
+* v0.6
+* database operations (RDS)
+* binding database data to views
+* make release v0.6
+* update sillywidgets.com
+* v0.7
 
 # spinoffs, OR coming soon, OR could potentially might happen
 
 * Codeless - genericize the controller and view to allow users to accomplish everything in the HTML without having to write any code
 * SillyBlog - a derived blog engine
+* SillyOMG - a help desk of sorts, or, as we used to call it, the no-help desk. Get it? DO YOU GET IT?
