@@ -123,9 +123,6 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 
 # todo
 
-* v0.4
-* split repositories into separate projects
-* Build and launch sillywidgets.com placeholder
 * v0.5
 * transition to netcoreapp2.0
 * make dealing with local views and resources (like css) better (seamless)
