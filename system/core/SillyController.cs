@@ -2,6 +2,8 @@ using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
+using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace SillyWidgets
 {
@@ -24,30 +26,31 @@ namespace SillyWidgets
                 throw new SillyException(SillyHttpStatusCode.NotFound, "View file '" + filepath + "' does not exist");
             }
 
-            SillyView view = new SillyView();
+            SillyView view = null;
             FileStream fileStream = new FileStream(filepath, FileMode.Open);
 
             using (StreamReader reader = new StreamReader(fileStream))
             {
+                view = new SillyView();
                 view.Load(reader);
             }
 
             return(view);
         }
 
-        public T LoadViewAsync<T>() where T : ISillyView
+        public async Task<ISillyView> LoadViewAsync(string bucket, string key, Amazon.RegionEndpoint endpoint)
         {
-            return(default(T));
-        }
+            SillyView view = null;
+            AmazonS3Client client = new AmazonS3Client(endpoint);
+            GetObjectResponse response = await client.GetObjectAsync(bucket, key);
 
-        public ISillyView LoadViewAsync(SillyResource viewFile, List<SillyResource> widgetFiles)
-        {
-            return(null);
-        }
+            using (StreamReader reader = new StreamReader(response.ResponseStream))
+            {
+                view = new SillyView();
+                view.Load(reader);
+            }
 
-        public void LoadData()
-        {
-            
+            return(view);
         }
     }
 }

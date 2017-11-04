@@ -1,4 +1,9 @@
+using System;
+using System.Threading.Tasks;
+using System.IO;
 using SillyWidgets;
+using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace SillyWidgetsLambda
 {
@@ -12,7 +17,7 @@ namespace SillyWidgetsLambda
 
         public ISillyView Index(ISillyContext context)
         {
-            SillyView home = new SillyView();//base.LoadView(@"views/index.html");
+            SillyView home = new SillyView();
             home.Content = "Silly Widgets v0.3 - Hello";
 
             /*home.Bind("pagetitle", "Silly Widgets v0.3");

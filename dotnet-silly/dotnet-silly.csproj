@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <AssemblyName>dotnet-silly</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>SillyWidgets.Tools</PackageId>
+    <AssemblyTitle>SillyWidgets.Tools</AssemblyTitle>
+    <Title>Silly Widgets Tools</Title>
+    <Authors>A-ron</Authors>
+    <Description>CLI tools to aid in the development of Silly Widgets applications.</Description>
+    <PackageTags>Lambda;CLI;C#</PackageTags>
+    <Version>1.0.0</Version>
+    <PackageType>DotnetCliTool</PackageType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SillyWidgets.Utilities" Version="0.3.0" />
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
