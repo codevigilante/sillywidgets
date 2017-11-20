@@ -110,12 +110,12 @@ namespace SillyWidgets
                         {
                             vars[index] = var;
                         }
-                    }
-
-                    object controllerTarget = Activator.CreateInstance(visitor.Controller);
+                    }                    
 
                     try
                     {
+                        object controllerTarget = Activator.CreateInstance(visitor.Controller);
+
                         ISillyView view = visitor.Method.Invoke(controllerTarget, vars) as ISillyView;
 
                         return(view);

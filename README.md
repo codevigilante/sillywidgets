@@ -1,4 +1,4 @@
-# sillywidgets v0.3
+# sillywidgets
 
 Silly Widgets is a C# .NET Core web framework for AWS Lambda. <Insert punchline here>  
 
@@ -23,7 +23,7 @@ Referring to myself in third person feels like an out of body experience. I'm so
 Use NUGET, the preferred package manager of .NET Core stuffs.
 
 Include in your `.csproj` file:
-* [sillywidgets version 0.3.0](https://www.nuget.org/packages/sillywidgets/) - the core crap
+* [sillywidgets version 0.5.0](https://www.nuget.org/packages/sillywidgets/) - the core crap
 * [SillyWidgets.Utilities version 0.3.0](https://www.nuget.org/packages/SillyWidgets.Utilities/) - some useful development tools, like a development HTTP server tailored to accept Silly Sites.
 
 # ideal development workflow
@@ -124,7 +124,8 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 # todo
 
 * v0.5
-* transition to netcoreapp2.0
+* make cold start faster
+* Allow caller to pick choose what type of view to create, instead of returning an ISillyView
 * make dealing with local views and resources (like css) better (seamless)
 * update namespaces
 * getting and processing views from S3
@@ -136,7 +137,8 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 * binding database data to views
 * make release v0.6
 * update sillywidgets.com
-* v0.7
+* vFUTURE
+* transition to netcoreapp2.0, when this is available in Lambda
 
 # spinoffs, OR coming soon, OR could potentially might happen
 

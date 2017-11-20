@@ -2,6 +2,7 @@ using Xunit;
 using SillyWidgets;
 using System;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace system.test
 {
