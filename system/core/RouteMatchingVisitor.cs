@@ -7,11 +7,11 @@ namespace SillyWidgets
 {
     internal class RouteMatchingVisitor : ISillySegmentVisitor
     {
-        public Type Controller { get; private set; }
+        public SillyController Controller { get; private set; }
         public MethodInfo Method { get; private set; }
         public List<object> Vars { get; private set; }
 
-        private Dictionary<string, Type> Controllers = null;
+        private Dictionary<string, SillyController> Controllers = null;
         private string currentSegment;
         private SillyRoute currentRoute;
         private bool segmentConsumed;
@@ -88,7 +88,7 @@ namespace SillyWidgets
             return(Controller != null && Method != null);
         }
 
-        public RouteMatchingVisitor(Dictionary<string, Type> registeredControllers)
+        public RouteMatchingVisitor(Dictionary<string, SillyController> registeredControllers)
         {
             Controllers = registeredControllers;
             Controller = null;
@@ -129,14 +129,14 @@ namespace SillyWidgets
             return(true);
         }
 
-        private Type GetController(string name)
+        private SillyController GetController(string name)
         {
             if (String.IsNullOrEmpty(name))
             {
                 return(null);
             }
 
-            Type selectedController = null;
+            SillyController selectedController = null;
 
             Controllers.TryGetValue(name.ToLower(), out selectedController);
 
@@ -145,7 +145,12 @@ namespace SillyWidgets
 
         private bool AssignMethod(string primary, string fallback)
         {
-            MethodInfo[] allMethods = Controller.GetMethods();
+            if (Controller == null)
+            {
+                return(false);
+            }
+
+            MethodInfo[] allMethods = Controller.GetType().GetMethods();
 
             Method = GetMethod(primary, allMethods);
 

@@ -8,9 +8,7 @@ namespace SillyWidgets
 
     public interface ISillyView
     {
-        /***** these two properties can be mothballed when everything is done, I think *****/
         SillyContentType ContentType { get; set; }
         string Content { get; set; }        
-        /********************************************************************************* */
     }
 }

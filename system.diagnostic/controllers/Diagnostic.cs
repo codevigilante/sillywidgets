@@ -29,18 +29,12 @@ namespace SillyDiagnostic
             Stopwatch timer2 = new Stopwatch();
             timer2.Start();
 
-            Task<ISillyView> result = base.LoadViewAsync("sillywidgets.com", "diagnostic/diag.html", Amazon.RegionEndpoint.USWest1);
+            SillyView home = new SillyView();
+            Task<bool> result = home.LoadS3Async("sillywidgets.com", "diagnostic/diag.html", Amazon.RegionEndpoint.USWest1);
 
             result.Wait();
 
             timer2.Stop();
-
-            SillyView home = result.Result as SillyView;
-
-            if (home == null)
-            {
-                return(null);
-            }
             
             home.Bind("content", "view.Content");
             home.Bind("loadViewLocal", timer1.Elapsed.TotalMilliseconds + "ms");

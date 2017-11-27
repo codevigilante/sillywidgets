@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp1.1</TargetFramework>
-    <Version>0.4</Version>
+    <Version>0.5</Version>
     <PackageId>SillyWidgets</PackageId>
     <Title>Silly Widgets</Title>
     <Authors>A-ron</Authors>

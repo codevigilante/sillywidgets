@@ -11,7 +11,7 @@ namespace SillyDiagnostic
         public SillyWidgetsDiagnostic()
             : base()
         {
-            base.RegisterController("diagnostic", typeof(Diagnostic));
+            base.RegisterController("diagnostic", new Diagnostic());
 
             GET("root", "/", "diagnostic", "Index");
         }
