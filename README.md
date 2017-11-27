@@ -1,4 +1,4 @@
-# sillywidgets v0.3
+# sillywidgets
 
 Silly Widgets is a C# .NET Core web framework for AWS Lambda. <Insert punchline here>  
 
@@ -23,7 +23,7 @@ Referring to myself in third person feels like an out of body experience. I'm so
 Use NUGET, the preferred package manager of .NET Core stuffs.
 
 Include in your `.csproj` file:
-* [sillywidgets version 0.3.0](https://www.nuget.org/packages/sillywidgets/) - the core crap
+* [sillywidgets version 0.5](https://www.nuget.org/packages/sillywidgets/) - the core crap
 * [SillyWidgets.Utilities version 0.3.0](https://www.nuget.org/packages/SillyWidgets.Utilities/) - some useful development tools, like a development HTTP server tailored to accept Silly Sites.
 
 # ideal development workflow
@@ -42,6 +42,11 @@ PLEASE DO NOT PUBLISH YOUR ACCESS KEYS. THIS INCLUDES PUSHING THEM TO A PUBLIC (
 
 The very third thing you should do is create an IAM Role for your lambda function. This role should provide full access to S3 and any other services your lambda function will use, but only those services and nothing else. This will be the role you assign your lambda function when you're ready to set it up.
 
+### Lambda setup tips
+
+* The more memory you allocate to your function, the more CPU power you get.
+* "Cold" start times are a bitch, so if you're function is called infrequently, it might be wiser to allocate more memory to cut down on startup costs. If your function is called frequently, like within the threshold of when AWS spins your function down, then you can probably get away with using less memory.
+
 ## local development
 
 Create a directory structure that looks like this:  
@@ -51,17 +56,17 @@ Create a directory structure that looks like this:
         * `controllers` - where you'll put your controller classes
         * `views` - where you'll put view stuff
     * `local` or `test` or `dev` - where you'll test your site locally
-    * (optional) `unit` or `test` or `whatever` - where you'll do your unit testing, if your of that sort  
+    * (optional) `unit` or `test` or `whatever` - where you'll do your unit testing, if you're of that sort  
   
 Make a new classlib project in the `lambda` dir:
 
-* `dotnet new lasslib -f netcoreapp1.1`
+* `dotnet new classlib -f netcoreapp1.1`
 * Rename the `.csproj` and `Class1.cs` if you like
 
 Add Silly Widgets package reference in `.csproj`:
 
 `<ItemGroup>
-    <PackageReference Include="sillywidgets" Version="0.3.0" />
+    <PackageReference Include="sillywidgets" Version="0.5.0" />
 </ItemGroup>`
 
 Run `dotnet restore`
@@ -78,7 +83,7 @@ Add content to the view `view.Content = "Hello World";`
 
 Return the view 'return(view);`
 
-Back in your proxy class, register your controller `base.RegisterController("your-key", typeof(your-controller-type));`
+Back in your proxy class, register your controller `base.RegisterController("your-key", new WhateverController());`
 
 Then setup the route that applies to this controller `GET("root", "/", "root", "Index");`
 
@@ -123,23 +128,25 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 
 # todo
 
-* v0.5
-* transition to netcoreapp2.0
-* make dealing with local views and resources (like css) better (seamless)
-* update namespaces
-* getting and processing views from S3
-* dealing with widgets
-* make release v0.5
-* update sillywidgets.com
 * v0.6
 * database operations (RDS)
-* binding database data to views
+* binding database data to views, which means expanding the types accepted in the view (text, int, list, etc)
+* how to deal with widgets, chunks of HTML code inserted into a view, which may not even be needed
+* update unit tests
 * make release v0.6
-* update sillywidgets.com
-* v0.7
+* update diagnostic
+* vFUTURE
+* transition to netcoreapp2.0, when this is available in Lambda
+* add a CLI tool to spin up a new project to avoid creating all the scaffolding code by hand
 
 # spinoffs, OR coming soon, OR could potentially might happen
 
 * Codeless - genericize the controller and view to allow users to accomplish everything in the HTML without having to write any code
 * SillyBlog - a derived blog engine
 * SillyOMG - a help desk of sorts, or, as we used to call it, the no-help desk. Get it? DO YOU GET IT?
+
+#### internal use only
+
+Do not read this. Reading this will give you AIDS and cancer and cause your penis/vagina to fall off.
+
+`dotnet pack -o ./bin/Release/ -c Release` 

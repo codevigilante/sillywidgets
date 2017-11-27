@@ -7,7 +7,7 @@ namespace SillyWidgets
     {
         public SillyOptions Options { get; private set; }
 
-        private Dictionary<string, Type> Controllers = new Dictionary<string, Type>();
+        private Dictionary<string, SillyController> Controllers = new Dictionary<string, SillyController>();
         private Dictionary<SupportedHttpMethods, List<SillyRoute>> Routes = new Dictionary<SupportedHttpMethods, List<SillyRoute>>()
         {
             { SupportedHttpMethods.Get, new List<SillyRoute>() },
@@ -30,14 +30,22 @@ namespace SillyWidgets
             return(AddRoute(SupportedHttpMethods.Post, key, urlPattern, controller, method));
         }
 
-        protected void RegisterController(string key, Type controllerType)
+        protected void RegisterController(string key, SillyController controller)
         {
             if (String.IsNullOrEmpty(key))
             {
-                key = controllerType.Name.ToLower();
+                if (controller == null)
+                {
+                    throw new SillyException(SillyHttpStatusCode.ServerError, "Cannot register empty key AND null Controller");
+                }
+
+                key = controller.GetType().Name.ToLower();
             }
 
-            Controllers[key] = controllerType;
+            // if controller is null, it will be culled out if the controller is ever selected for execution, so we don't
+            // blow up the entire system if one controller is "bad"
+            // should probably log this somewhere, that'd be nice, m'kay
+            Controllers[key] = controller;
         }
 
         private SillyRoute AddRoute(SupportedHttpMethods httpMethod, string key, string urlPattern, string controller, string method)
@@ -110,13 +118,11 @@ namespace SillyWidgets
                         {
                             vars[index] = var;
                         }
-                    }
-
-                    object controllerTarget = Activator.CreateInstance(visitor.Controller);
+                    }                    
 
                     try
                     {
-                        ISillyView view = visitor.Method.Invoke(controllerTarget, vars) as ISillyView;
+                        ISillyView view = visitor.Method.Invoke(visitor.Controller, vars) as ISillyView;
 
                         return(view);
                     }

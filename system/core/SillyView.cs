@@ -1,8 +1,11 @@
 using System;
 using System.Text;
+using System.Threading.Tasks;
 using System.IO;
 using System.Collections.Generic;
 using SillyWidgets.Gizmos;
+using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace SillyWidgets
 {
@@ -47,6 +50,44 @@ namespace SillyWidgets
             {
                 throw new Exception("Parsing HTML: " + Html.ParseError);
             }
+        }
+
+        public async Task<bool> LoadS3Async(string bucket, string key, Amazon.RegionEndpoint endpoint)
+        {
+            AmazonS3Client S3Client = new AmazonS3Client(endpoint);
+            GetObjectResponse response = await S3Client.GetObjectAsync(bucket, key);
+
+            using (StreamReader reader = new StreamReader(response.ResponseStream))
+            {
+                Load(reader);
+            }
+
+            return(true);
+        }
+
+        public SillyView Load(string filepath)
+        {
+            if (filepath == null ||
+                filepath.Length == 0)
+            {
+                throw new SillyException(SillyHttpStatusCode.NotFound, "Invalid view file specified, either NULL or empty");
+            }
+
+            if (!File.Exists(filepath))
+            {
+                throw new SillyException(SillyHttpStatusCode.NotFound, "View file '" + filepath + "' does not exist");
+            }
+
+            SillyView view = null;
+            FileStream fileStream = new FileStream(filepath, FileMode.Open);
+
+            using (StreamReader reader = new StreamReader(fileStream))
+            {
+                view = new SillyView();
+                view.Load(reader);
+            }
+
+            return(view);
         }
 
         public void Bind(string key, string text)

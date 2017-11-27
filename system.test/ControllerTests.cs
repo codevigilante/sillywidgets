@@ -2,6 +2,7 @@ using Xunit;
 using SillyWidgets;
 using System;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace system.test
 {
@@ -11,15 +12,15 @@ namespace system.test
         public void GetFromS3Test()
         {
             Console.Write("Controller Get S3 -> ");
-            SillyController controller = new SillyController();
+            SillyView view = new SillyView();
 
-            Task<ISillyView> view = controller.LoadViewAsync("sillywidgets.com", "testdata/testS3.html", Amazon.RegionEndpoint.USWest1);
+            Task<bool> result = view.LoadS3Async("sillywidgets.com", "testdata/testS3.html", Amazon.RegionEndpoint.USWest1);
 
-            view.Wait();
+            result.Wait();
 
-            Assert.True(view != null);
+            Assert.True(result.Result);
 
-            Console.WriteLine(view.Result.Content);
+            Console.WriteLine(view.Render());
         }
     }
 }

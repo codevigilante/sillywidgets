@@ -154,8 +154,8 @@ namespace system.test
             public DispatchTester()
                 : base()
             {
-                base.RegisterController("root", typeof(Root));
-                base.RegisterController("admin", typeof(Admin));
+                base.RegisterController("root", new Root());
+                base.RegisterController("admin", new Admin());
 
                 GET("empty", "/", "root", "index");
                 GET("home", "/:method", "root", "index");
