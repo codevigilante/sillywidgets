@@ -86,7 +86,7 @@ namespace SillyWidgets.Gizmos
                         continue;
                     }
 
-                    string text = content.ToString().Trim();
+                    string text = content.ToString();
 
                     if (text.Length > 0)
                     {

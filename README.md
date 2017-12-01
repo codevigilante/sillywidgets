@@ -129,6 +129,7 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 # todo
 
 * v0.6
+* when rendering, natural spaces between elements gets eliminated. stop it
 * database operations (RDS)
 * binding database data to views, which means expanding the types accepted in the view (text, int, list, etc)
 * how to deal with widgets, chunks of HTML code inserted into a view, which may not even be needed
