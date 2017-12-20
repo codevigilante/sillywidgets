@@ -128,9 +128,6 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 
 # todo
 
-* v0.6
-* make release v0.6
-* update diagnostic
 * v0.7
 * get rid of SillyController, it's not needed, and think about how to map URLs to views instead
 * actually, in reference to the point above, dispense of the whole defining URLs and try to map them to views and methods
