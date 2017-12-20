@@ -1,35 +1,35 @@
 using System;
+using System.Collections.Generic;
 using SillyWidgets.Gizmos;
 
 namespace SillyWidgets
 {
     public class SillyAttribute
     {
-        public enum SillyAttrType { Text, View, Unsupported }
+        public enum SillyAttrType { Text, Widget, Unsupported }
         public SillyAttrType Type { get; private set; }
-        public string Key { get; set; }
+        public string Name { get; private set; }
 
-        public SillyAttribute(string name)
-        {
-            Key = name;
-        }
-
-        protected SillyAttribute(SillyAttrType type)
+        public SillyAttribute(string name, SillyAttrType type)
         {            
             Type = type;
+            Name = name;
         }
 
-        public static bool TryCreateSillyAttribute(string name, out SillyAttribute attribute)
+        public virtual List<TreeNodeGizmo> BoundValues()
         {
-            attribute = null;
+            return(new List<TreeNodeGizmo>());
+        }
 
-            if (name == null ||
-                name.Length == 0)
+        public static bool IsSillyAttribute(string attr)
+        {
+            if (attr == null ||
+                attr.Length == 0)
             {
                 return(false);
             }
 
-            string[] parts = name.Split(new char[] { ':' });
+            string[] parts = attr.Split(new char[] { ':' });
 
             if (parts == null ||
                 parts.Length <= 1)
@@ -39,23 +39,47 @@ namespace SillyWidgets
 
             if (String.Compare(parts[0], "silly", false) == 0)
             {
-                if (parts[1].Contains("text"))
-                {
-                    attribute = new SillyAttribute(SillyAttrType.Text);
-                }
-                else if (parts[1].Contains("view"))
-                {
-                    attribute = new SillyAttribute(SillyAttrType.View);
-                }
-                else
-                {
-                    attribute = new SillyAttribute(SillyAttrType.Unsupported);
-                }      
-
                 return(true);
             }
 
             return(false);
+        }
+    }
+
+    public class SillyTextAttribute : SillyAttribute
+    {
+        private TreeNodeGizmo Value = null;
+
+        public SillyTextAttribute(string name, TreeNodeGizmo value)
+            : base(name, SillyAttrType.Text)
+        {
+            Value = value;
+        }
+
+        public override List<TreeNodeGizmo> BoundValues()
+        {
+            return(new List<TreeNodeGizmo>() { Value });
+        }
+    }
+
+    public class SillyWidgetAttribute : SillyAttribute
+    {
+        private List<TreeNodeGizmo> HtmlNodes = null;
+
+        public SillyWidgetAttribute(string name, List<TreeNodeGizmo> htmlNodes)
+            : base(name, SillyAttrType.Widget)
+        {
+            HtmlNodes = htmlNodes;
+        }
+
+        public override List<TreeNodeGizmo> BoundValues()
+        {
+            if (HtmlNodes == null)
+            {
+                return(new List<TreeNodeGizmo>() { new TextNode(base.Name + ": no HTML to bind") });
+            }
+
+            return(HtmlNodes);
         }
     }
 }

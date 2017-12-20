@@ -8,6 +8,18 @@ namespace SillyWidgets.Gizmos
     public class HtmlGizmo
     {
         public string ParseError { get; private set; }
+        public List<TreeNodeGizmo> Root
+        {
+            get
+            {
+                if (DocRoot == null)
+                {
+                    return(null);
+                }
+
+                return(DocRoot.GetChildren());
+            }
+        }
 
         private HtmlLexerGizmo Lexer = null;
         private HtmlStateMachineGizmo StateMachine = null;

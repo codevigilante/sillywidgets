@@ -106,11 +106,9 @@ namespace system.test
                 
                 try
                 {
-                    SillyProxyRequest request = new SillyProxyRequest();
-                    request.path = route;
-                    request.httpMethod = "GET";
-                    SillyProxyContext context = new SillyProxyContext(request);
-                    ISillyView content = dispatcher.Dispatch(context);
+                    dispatcher.Path = route;
+                    dispatcher.HttpMethod = SupportedHttpMethods.Get;
+                    ISillyView content = dispatcher.Dispatch(dispatcher);
 
                     Console.WriteLine((content == null) ? "null" : content.Content);
 
@@ -130,11 +128,9 @@ namespace system.test
                 
                 try
                 {
-                    SillyProxyRequest request = new SillyProxyRequest();
-                    request.path = invalid;
-                    request.httpMethod = "GET";
-                    SillyProxyContext context = new SillyProxyContext(request);
-                    ISillyView content = dispatcher.Dispatch(context);
+                    dispatcher.Path = invalid;
+                    dispatcher.HttpMethod = SupportedHttpMethods.Get;
+                    ISillyView content = dispatcher.Dispatch(dispatcher);
 
                     Console.WriteLine((content == null) ? "null" : content.Content);
 

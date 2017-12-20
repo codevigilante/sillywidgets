@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using SillyWidgets.Gizmos;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Amazon.DynamoDBv2.DocumentModel;
 
 namespace SillyWidgets
 {
@@ -13,7 +14,7 @@ namespace SillyWidgets
     {
         public SillyContentType ContentType { get; set; }
 
-        private Dictionary<string, TreeNodeGizmo> BindVals = new Dictionary<string, TreeNodeGizmo>();
+        private Dictionary<string, SillyAttribute> BindVals = new Dictionary<string, SillyAttribute>();
 
         public string Content
         { 
@@ -91,10 +92,49 @@ namespace SillyWidgets
         }
 
         public void Bind(string key, string text)
-        {       
-            TextNode textNode = new TextNode(text);
+        {
+            BindVals[key] = new SillyTextAttribute(key, new TextNode(text));
+        }
 
-            BindVals[key] = new TextNode(text);
+        public void Bind(Document dynamoItem)
+        {
+            foreach(KeyValuePair<string, DynamoDBEntry> entry in dynamoItem)
+            {
+                BindVals[entry.Key] = new SillyTextAttribute(entry.Key, new TextNode(entry.Value.AsString()));
+            }
+        }
+
+        public void Bind(string key, SillyView view)
+        {
+            if (view == null ||
+                view.Html == null)
+            {
+                TextNode errorNode = new TextNode("Error binding " + key + ": no view or HTML to bind");
+
+                BindVals[key] = new SillyTextAttribute(key, errorNode);
+
+                return;
+            }
+
+            BindVals[key] =  new SillyWidgetAttribute(key, view.Html.Root);
+        }
+
+        public async Task<bool> BindAsync(string key, string bucket, string bucketKey, Amazon.RegionEndpoint endpoint)
+        {
+            SillyView s3View = new SillyView();
+
+            bool loaded = await s3View.LoadS3Async(bucket, bucketKey, endpoint);
+
+            if (loaded)
+            {
+                Bind(key, s3View);
+            }
+            else
+            {
+                Bind(key, "Silly view not found: " + key);
+            }
+
+            return(loaded);
         }
 
         public string Render()
@@ -118,9 +158,9 @@ namespace SillyWidgets
     {
         public StringBuilder Payload { get; private set; }
         private bool Exiting = false;
-        private Dictionary<string, TreeNodeGizmo> BindVals = null;
+        private Dictionary<string, SillyAttribute> BindVals = null;
 
-        public HtmlPayloadVisitor(Dictionary<string, TreeNodeGizmo> bindVals)
+        public HtmlPayloadVisitor(Dictionary<string, SillyAttribute> bindVals)
         {
             Payload = new StringBuilder();
             BindVals = bindVals;
@@ -133,7 +173,6 @@ namespace SillyWidgets
                 return;
             }
 
-            //Console.WriteLine(node.Name);
             Exiting = false;
             node.Accept(this);
 
@@ -173,17 +212,25 @@ namespace SillyWidgets
                 {
                     if (BindVals != null)
                     {
-                        SillyAttribute sillyAttr = null;
-
-                        if (SillyAttribute.TryCreateSillyAttribute(attr.Key, out sillyAttr))
+                        if (SillyAttribute.IsSillyAttribute(attr.Key))
                         {
-                            //Console.WriteLine("Bind: " + attr.Key + " = " + attr.Value);
-                            TreeNodeGizmo bindNode = null;
+                            SillyAttribute boundAttr = null;
 
-                            if (BindVals.TryGetValue(attr.Value, out bindNode))
+                            if (BindVals.TryGetValue(attr.Value, out boundAttr))
                             {
                                 node.DeleteChildren();
-                                node.AddChild(bindNode);
+
+                                if (boundAttr.BoundValues().Count == 0)
+                                {
+                                    node.AddChild(new TextNode("Error rendering " + attr.Value + ": trying to bind null node"));
+                                }
+                                else
+                                {
+                                    foreach(TreeNodeGizmo childNode in boundAttr.BoundValues())
+                                    {
+                                        node.AddChild(childNode);
+                                    }
+                                }                     
 
                                 continue;
                             }
