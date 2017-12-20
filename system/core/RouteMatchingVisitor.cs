@@ -25,8 +25,6 @@ namespace SillyWidgets
                 return(false);
             }
 
-            //Console.WriteLine("Testing route = " + route.UrlPattern + ":" + route.Name);
-
             currentRoute = route;
 
             int index = 0;

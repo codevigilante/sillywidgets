@@ -45,7 +45,7 @@ The very third thing you should do is create an IAM Role for your lambda functio
 ### Lambda setup tips
 
 * The more memory you allocate to your function, the more CPU power you get.
-* "Cold" start times are a bitch, so if you're function is called infrequently, it might be wiser to allocate more memory to cut down on startup costs. If your function is called frequently, like within the threshold of when AWS spins your function down, then you can probably get away with using less memory.
+* **"Cold" start times are a bitch**, so if you're function is called infrequently, it might be wiser to allocate more memory to cut down on startup costs. If your function is called frequently, like within the threshold of when AWS spins your function down, then you can probably get away with using less memory.
 
 ## local development
 
@@ -129,13 +129,19 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 # todo
 
 * v0.6
-* database operations (RDS)
-* binding database data to views, which means expanding the types accepted in the view (text, int, list, etc)
-* how to deal with widgets, chunks of HTML code inserted into a view, which may not even be needed
-* update unit tests
 * make release v0.6
 * update diagnostic
+* v0.7
+* get rid of SillyController, it's not needed, and think about how to map URLs to views instead
+* actually, in reference to the point above, dispense of the whole defining URLs and try to map them to views and methods
+* bind lists and maps, and/or be able to loop over a collection in the view
+* should probably check Http response codes when doing AWS shit
+* figure out to resolve POST and GET
+* and start thinking about sessions and cookies and shit
 * vFUTURE
+* improve loading from S3, dynamo
+* improve parsing HTML
+* is there a way to not use HTML but still keep the view separate? (i.e. not having to compile every time a little thing changes, or at least cache HTML so it doesn't always have to be loaded)
 * transition to netcoreapp2.0, when this is available in Lambda
 * add a CLI tool to spin up a new project to avoid creating all the scaffolding code by hand
 

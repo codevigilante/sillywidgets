@@ -12,11 +12,27 @@ using Amazon;
 
 namespace SillyWidgets
 {
-    public abstract class SillyProxyApplication : SillyApplication
+    public abstract class SillyProxyApplication : SillyApplication, ISillyContext
     {
+        public string Path { get; set; }
+        public SillyProxyRequest OriginalRequest { get; private set; }
+        public SupportedHttpMethods HttpMethod { get; set; }
 
         public SillyProxyApplication()
         {
+            Path = string.Empty;
+            OriginalRequest = null;
+            HttpMethod = SupportedHttpMethods.Unsupported;
+        }
+
+        public object GET(string name)
+        {
+            return(null);
+        }
+
+        public object POST(string name)
+        {
+            return(null);
         }
 
         //********************************************************************
@@ -31,17 +47,18 @@ namespace SillyWidgets
                 {
                     throw new SillyException(SillyHttpStatusCode.ServerError, "Request aborted upon delivery.");
                 }
-            
-                ISillyContext sillyContext = CreateContext(input);                
-                ISillyView sillyContent = Dispatch(sillyContext);
+
+                OriginalRequest = input;
+                HttpMethod = StringToHttpMethod(input.httpMethod);
+                Path = input.path;               
+
+                ISillyView sillyContent = Dispatch(this);
 
                 if (sillyContent == null)
                 {
                     throw new SillyException(SillyHttpStatusCode.NotFound, "The path " + input.path + " does not exist.");
                 }
                 
-                lambdaContext.Logger.LogLine("Request completed for path '" + input.path + "'");
-
                 SillyProxyResponse response = new SillyProxyResponse();
                 response.body = sillyContent.Content;
 
@@ -57,9 +74,24 @@ namespace SillyWidgets
             }
         }
 
-        protected virtual ISillyContext CreateContext(SillyProxyRequest request)
+        private SupportedHttpMethods StringToHttpMethod(string httpMethod)
         {
-            return (new SillyProxyContext(request));
+            if (String.IsNullOrEmpty(httpMethod))
+            {
+                return(SupportedHttpMethods.Unsupported);
+            }
+
+            if (String.Compare(httpMethod, "GET", true) == 0)
+            {
+                return(SupportedHttpMethods.Get);
+            }
+            
+            if (String.Compare(httpMethod, "Post", true) == 0)
+            {
+                return(SupportedHttpMethods.Post);
+            }
+
+            return(SupportedHttpMethods.Unsupported);
         }
 
         private SillyProxyResponse buildErrorResponse(SillyException ex)

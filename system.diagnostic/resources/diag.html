@@ -5,8 +5,11 @@
         <link rel="stylesheet" type="text/css" href="https://s3-us-west-1.amazonaws.com/sillywidgets.com/diagnostic/style.css">
     </head>
     <body>
-        <h1>Silly Widgets Diagnostic...</h1>
-        <p>CreateView... <span silly:text="content">{content}</span>-> <span silly:text="loadViewLocal">{local}</span></p>
-        <p>LoadViewS3...  <span silly:text="s3source">{source}</span>-> <span silly:text="loadViewValue">{value}</span></p>
+        <div silly:widget="header" class="header">{header}</div>
+        <div silly:widget="content" class="content"></div>
+        <div class="footer">
+            <p>Contact: <span silly:text="email">{email}</span></p>
+            <p>Don't forget: <span silly:text="herotitle">{hero title}</span></p>
+        </div>        
     </body>
 </html>

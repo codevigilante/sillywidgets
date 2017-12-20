@@ -8,7 +8,7 @@ namespace SillyWidgets.Gizmos
 
     public class HtmlStateMachineGizmo : IStateMachineGizmo<States, Token>
     {
-        private static Dictionary<States, HtmlState> StateLookup = new Dictionary<States, HtmlState>()
+        private Dictionary<States, HtmlState> StateLookup = new Dictionary<States, HtmlState>()
         {
             { States.Begin, new BEGIN() },
             { States.Start, new START() },
@@ -357,7 +357,7 @@ namespace SillyWidgets.Gizmos
             {
                 if (Name.Length == 0)
                 {
-                    throw new Exception("I think you should try assigning a name to Attribute before giving me a value");
+                    throw new Exception("I think you should try assigning a name to Attribute before giving me a value: " + token.Value);
                 }
 
                 context.TreeBuilder.AddAttribute(Name, token.Value);
