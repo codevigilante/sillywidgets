@@ -23,8 +23,8 @@ Referring to myself in third person feels like an out of body experience. I'm so
 Use NUGET, the preferred package manager of .NET Core stuffs.
 
 Include in your `.csproj` file:
-* [sillywidgets version 0.5](https://www.nuget.org/packages/sillywidgets/) - the core crap
-* [SillyWidgets.Utilities version 0.3.0](https://www.nuget.org/packages/SillyWidgets.Utilities/) - some useful development tools, like a development HTTP server tailored to accept Silly Sites.
+* [sillywidgets version 0.6](https://www.nuget.org/packages/sillywidgets/) - the core crap
+* [SillyWidgets.Utilities version 0.4.0](https://www.nuget.org/packages/SillyWidgets.Utilities/) - some useful development tools, like a development HTTP server tailored to accept Silly Sites.
 
 # ideal development workflow
 
