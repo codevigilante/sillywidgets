@@ -7,6 +7,7 @@ namespace system.test
 {
     public class RouteTests
     {
+        /*
         private readonly SillyRoute route;
 
         public RouteTests()
@@ -246,5 +247,6 @@ namespace system.test
                 return(content);
             }
         }
+        */
     }
 }

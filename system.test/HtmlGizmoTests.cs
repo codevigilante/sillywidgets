@@ -8,6 +8,7 @@ namespace system.test
 {
     public class HtmlGizmoTests
     {
+        /*
         public HtmlGizmoTests()
         {
 
@@ -50,5 +51,6 @@ namespace system.test
 
             Console.WriteLine();
         }
+        */
     }
 }

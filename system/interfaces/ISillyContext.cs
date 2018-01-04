@@ -2,7 +2,7 @@ using System;
 
 namespace SillyWidgets
 {
-    public enum SupportedHttpMethods { Get, Post, Unsupported }
+    public enum SupportedHttpMethods { All, Get, Post, Unsupported }
 
     public interface ISillyContext
     {

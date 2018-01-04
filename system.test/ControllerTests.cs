@@ -10,6 +10,7 @@ namespace system.test
 {
     public class ControllerTests
     {
+        /*
         [Fact]
         public void GetFromS3Test()
         {
@@ -64,5 +65,6 @@ namespace system.test
 
             Console.WriteLine(view.Render());
         }
+        */
     }
 }

@@ -29,5 +29,23 @@ namespace SillyDiagnostic
 
             return(response);
         }
+
+        [SillyUrlHandler(IsIndex = true)] // /[penis]
+        public ISillyView Index(ISillyContext context, string penis = "")
+        {
+            return(null);
+        }
+
+        [SillyUrlHandler()] // /about
+        public ISillyView About(ISillyContext context)
+        {
+            return(null);
+        }
+
+        [SillyUrlHandler("/blog")] // /blog/posts/{num}
+        public ISillyView Posts(ISillyContext context, int num)
+        {
+            return(null);
+        }
     }
 }

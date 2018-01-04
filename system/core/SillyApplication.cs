@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
 
 namespace SillyWidgets
 {
     public abstract class SillyApplication
     {
-        public SillyOptions Options { get; private set; }
-
         private Dictionary<string, SillyController> Controllers = new Dictionary<string, SillyController>();
         private Dictionary<SupportedHttpMethods, List<SillyRoute>> Routes = new Dictionary<SupportedHttpMethods, List<SillyRoute>>()
         {
@@ -16,8 +16,8 @@ namespace SillyWidgets
         };
 
         public SillyApplication()
-        {
-            Options = new SillyOptions();    
+        {    
+            DiscoverHandlers(this.GetType());
         }
 
         public SillyRoute GET(string key, string urlPattern, string controller, string method)
@@ -46,6 +46,65 @@ namespace SillyWidgets
             // blow up the entire system if one controller is "bad"
             // should probably log this somewhere, that'd be nice, m'kay
             Controllers[key] = controller;
+        }
+
+        private void DiscoverHandlers(Type type)
+        {
+            // method has to be public, return an ISillyView, and take ISillyContext as first argument
+            MethodInfo[] allMethods = type.GetMethods();
+
+            IEnumerable<MethodInfo> methods = allMethods.Where
+            (
+                m => m.ReturnType.IsAssignableFrom(typeof(ISillyView)) &&
+                     m.GetParameters().Length >= 1 &&
+                     m.GetParameters()[0].ParameterType == typeof(ISillyContext) &&
+                     m.IsPublic
+            );
+
+            if (methods == null ||
+                methods.Count() == 0)
+            {
+                return;
+            }
+
+            foreach(MethodInfo info in methods)
+            {
+                IEnumerable<Attribute> attributes = info.GetCustomAttributes();
+
+                foreach(Attribute attr in attributes)
+                {
+                    SillyUrlHandlerAttribute urlHandler = attr as SillyUrlHandlerAttribute;
+
+                    if (urlHandler != null)
+                    {
+                        // map this Url to the handler method
+                        
+                    }
+                }
+            }
+
+            /*int varCount = currentRoute.VarCount + 1;
+
+            IEnumerable<MethodInfo> methods = candidateMethods.Where
+            (
+                m => String.Compare(m.Name, name, true) == 0 &&
+                        m.ReturnType.IsAssignableFrom(typeof(ISillyView)) &&
+                        m.GetParameters().Length == varCount &&
+                        m.GetParameters()[0].ParameterType == typeof(ISillyContext)
+            );
+
+            if (methods == null ||
+                methods.Count() == 0)
+            {
+                return(null);
+            }
+
+            return(methods.ElementAt(0));*/
+
+            // also has to declare SillyUrlHandler, passing in an optional prefix
+            // this particular method maps to the url: /admin/user/[entries]
+            // [SillyUrlHandler(prefix = "")]
+            // maybe allow SillyUrlHandler to be applied to a class, adding a prefix to all the methods?
         }
 
         private SillyRoute AddRoute(SupportedHttpMethods httpMethod, string key, string urlPattern, string controller, string method)
