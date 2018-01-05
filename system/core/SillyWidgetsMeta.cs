@@ -2,6 +2,6 @@ namespace SillyWidgets
 {
     public static class SillyWidgetsMeta
     {
-        public static string Version = "0.6";
+        public static string Version = "0.7";
     }
 }

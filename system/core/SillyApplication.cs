@@ -5,135 +5,121 @@ namespace SillyWidgets
 {
     public abstract class SillyApplication
     {
-        public SillyOptions Options { get; private set; }
+        private SillySegment Root = null;
 
-        private Dictionary<string, SillyController> Controllers = new Dictionary<string, SillyController>();
-        private Dictionary<SupportedHttpMethods, List<SillyRoute>> Routes = new Dictionary<SupportedHttpMethods, List<SillyRoute>>()
-        {
-            { SupportedHttpMethods.Get, new List<SillyRoute>() },
-            { SupportedHttpMethods.Post, new List<SillyRoute>() }
-
-        };
-
-        public SillyApplication()
-        {
-            Options = new SillyOptions();    
+        public SillyApplication(ISillyView homeView = null)
+        {  
+            Root = new SillySegment("/", homeView);
         }
 
-        public SillyRoute GET(string key, string urlPattern, string controller, string method)
+        protected bool MapView(ISillyView view)
         {
-            return(AddRoute(SupportedHttpMethods.Get, key, urlPattern, controller, method));
-        }
-
-        public SillyRoute POST(string key, string urlPattern, string controller, string method)
-        {
-            return(AddRoute(SupportedHttpMethods.Post, key, urlPattern, controller, method));
-        }
-
-        protected void RegisterController(string key, SillyController controller)
-        {
-            if (String.IsNullOrEmpty(key))
+            if (view == null)
             {
-                if (controller == null)
+                return(false);
+            }
+
+            string segment = view.Name;
+            
+            if (String.IsNullOrEmpty(segment) ||
+                String.IsNullOrWhiteSpace(segment))
+            {
+                segment = view.GetType().Name;
+            }  
+
+            string[] prefixSegments = view.UrlPrefix.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            SillySegment current = Root;
+
+            foreach(string prefix in prefixSegments)
+            {
+                SillySegment child = null;
+
+                if (current.FindPath(prefix, out child))
                 {
-                    throw new SillyException(SillyHttpStatusCode.ServerError, "Cannot register empty key AND null Controller");
+                    current = child;
                 }
+                else
+                {
+                    child = new SillySegment(prefix);
 
-                key = controller.GetType().Name.ToLower();
+                    current.AddChild(child);
+                    current = child;
+                }
             }
 
-            // if controller is null, it will be culled out if the controller is ever selected for execution, so we don't
-            // blow up the entire system if one controller is "bad"
-            // should probably log this somewhere, that'd be nice, m'kay
-            Controllers[key] = controller;
+            SillySegment viewSegment = new SillySegment(segment, view);
+
+            bool wasMapped = current.AddChild(viewSegment);
+
+            return(wasMapped);
         }
 
-        private SillyRoute AddRoute(SupportedHttpMethods httpMethod, string key, string urlPattern, string controller, string method)
+        public virtual string Render(ISillyContext context)
         {
-            if (String.IsNullOrEmpty(key))
+            if (context == null)
             {
-                key = "default";
+                throw new SillyException(SillyHttpStatusCode.ServerError, "No context to process request");
             }
 
-            SillyRoute route = new SillyRoute(key, urlPattern, controller, method);
-
-            Routes[httpMethod].Add(route);
-
-            return(route);
-        }
-
-        public ISillyView Dispatch(ISillyContext context)
-        {
-            if (context == null ||
-                context.HttpMethod == SupportedHttpMethods.Unsupported)
+            if (context.HttpMethod == SupportedHttpMethods.Unsupported)
             {
-                return(null);
+                throw new SillyException(SillyHttpStatusCode.BadRequest, "Unsupported HTTP method");
             }
 
             string path = context.Path;
 
             if (String.IsNullOrEmpty(path) || String.IsNullOrWhiteSpace(path))
             {
-                return(null);
-            }
-
-            List<SillyRoute> availableRoutes = Routes[context.HttpMethod];
-
-            if (availableRoutes.Count == 0)
-            {
-                return(null);
-            }
+                throw new SillyException(SillyHttpStatusCode.ServerError, "Path is invalid: " + path);
+            }            
 
             string[] pathSegments = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
-            foreach(SillyRoute route in availableRoutes)
+            if (Root == null)
             {
-                if (route.Count == 0 ||
-                    !route.IsValid ||
-                    pathSegments.Length > route.Count)
+                throw new SillyException(SillyHttpStatusCode.NotImplemented, "No suitable view found");
+            }
+
+            if (pathSegments.Length == 0)
+            {
+                if (Root.View == null)
                 {
-                    continue;
+                    throw new SillyException(SillyHttpStatusCode.NotFound, "The path cannot be found: no home view");
+                }                
+
+                return(Root.View.Render(context, new string[] {}));
+            }
+
+            SillySegment current = Root;
+
+            for (int i = 0; i < pathSegments.Length; ++i)
+            {
+                string segment = pathSegments[i];
+                SillySegment next = null;
+
+                if (current.FindPath(segment, out next))
+                {
+                    current = next;
                 }
-
-                RouteMatchingVisitor visitor = new RouteMatchingVisitor(Controllers);
-
-                if (visitor.TryMatch(route, pathSegments))
+                else if (current.View != null &&
+                         current.View.AcceptsUrlParameters)
                 {
-                    if (visitor.Controller == null ||
-                        visitor.Method == null)
-                    {
-                        continue;
-                    }
-
-                    int varCount = 1 + visitor.Vars.Count;
-                    object[] vars = new object[varCount];
-
-                    vars[0] = context;
-
-                    if (visitor.Vars.Count > 0)
-                    {
-                        int index = 1;
-
-                        foreach(object var in visitor.Vars)
-                        {
-                            vars[index] = var;
-                        }
-                    }                    
-
-                    try
-                    {
-                        ISillyView view = visitor.Method.Invoke(visitor.Controller, vars) as ISillyView;
-
-                        return(view);
-                    }
-                    catch(Exception ex)
-                    {
-                        throw ex.InnerException;
-                    }
+                    ArraySegment<string> urlParams = new ArraySegment<string>(pathSegments, i, pathSegments.Length - i);
+                    
+                    return(current.View.Render(context, urlParams.Array));
+                }
+                else
+                {
+                    throw new SillyException(SillyHttpStatusCode.NotFound, "The path cannot be found: " + path);
                 }
             }
 
-            return(null);
+            if (current.View == null)
+            {
+                throw new SillyException(SillyHttpStatusCode.NotFound, "The path cannot be found: " + path);
+            }
+
+            return(current.View.Render(context, new string[] {}));
         }
     }
 }

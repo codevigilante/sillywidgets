@@ -3,8 +3,6 @@ using System.IO;
 
 namespace SillyWidgets
 {
-    public enum SillyResourceLocation { S3, LambdaFileSystem }
-
     public class SillyResource
     {
         public enum Types { CSS, JS, Img, Unknown }

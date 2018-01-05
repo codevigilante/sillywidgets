@@ -128,9 +128,10 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 
 # todo
 
-* v0.7
+* v0.7 - Jan 2018
 * get rid of SillyController, it's not needed, and think about how to map URLs to views instead
 * actually, in reference to the point above, dispense of the whole defining URLs and try to map them to views and methods
+* update diagnostic
 * bind lists and maps, and/or be able to loop over a collection in the view
 * should probably check Http response codes when doing AWS shit
 * figure out to resolve POST and GET
@@ -139,6 +140,7 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 * improve loading from S3, dynamo
 * improve parsing HTML
 * is there a way to not use HTML but still keep the view separate? (i.e. not having to compile every time a little thing changes, or at least cache HTML so it doesn't always have to be loaded)
+* abstract out SillyApplication, and think about how to build an HTTP server for Silly applications (like Tomcat for Java), or how to use in IIS
 * transition to netcoreapp2.0, when this is available in Lambda
 * add a CLI tool to spin up a new project to avoid creating all the scaffolding code by hand
 

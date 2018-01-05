@@ -7,13 +7,14 @@ namespace system.test
 {
     public class RouteTests
     {
-        private readonly SillyRoute route;
+        //private readonly SillyRoute route;
 
         public RouteTests()
         {
-            route = null;
+            //route = null;
         }
 
+        /*
         [Fact]
         public void ValidRouteTests()
         {
@@ -72,13 +73,20 @@ namespace system.test
 
                 Assert.False(sr.IsValid);
             }
-        }
+        }*/
 
         [Fact]
         public void DispatchTests()
         {
-            DispatchTester dispatcher = new DispatchTester();            
+            /*DispatchTester dispatcher = new DispatchTester();  
+            dispatcher.Path = "/blog/admin/users/10/all";
+            dispatcher.HttpMethod = SupportedHttpMethods.Get;
 
+            ISillyView view = dispatcher.Render(dispatcher);
+
+            return;          */
+
+            /*
             List<string> routes = new List<string>()
             {
                 "/",
@@ -142,7 +150,7 @@ namespace system.test
 
                     Assert.True(false);
                 }
-            }
+            }*/
         }
 
         public class DispatchTester : SillyProxyApplication
@@ -150,18 +158,18 @@ namespace system.test
             public DispatchTester()
                 : base()
             {
-                base.RegisterController("root", new Root());
+                /*base.RegisterController("root", new Root());
                 base.RegisterController("admin", new Admin());
 
                 GET("empty", "/", "root", "index");
                 GET("home", "/:method", "root", "index");
                 GET("users", "/admin/users/{var}/{names}", "admin", "Users");
                 GET("twovars", "/:controller/:method/{var1}=herpes/{var2}=AIDS", "admin", "Index");
-                GET("admin", "/:controller/:method", "Admin", "Index");
+                GET("admin", "/:controller/:method", "Admin", "Index");*/
             }
         }
 
-        public class Root : SillyController
+        /*public class Root : SillyController
         {
             public Root()
             {          
@@ -245,6 +253,6 @@ namespace system.test
 
                 return(content);
             }
-        }
+        }*/
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using SillyWidgets.Gizmos;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 
 namespace SillyWidgets
@@ -33,13 +34,44 @@ namespace SillyWidgets
             }
         }
 
+        public string Name
+        {
+            get { return(_name); }
+        }
+
+        public string UrlPrefix
+        {
+            get { return(_urlPrefix); }
+        }
+
+        public bool AcceptsUrlParameters
+        {
+            get { return(_acceptUrlParams); }
+        }
+
         private string _content = string.Empty;
+        private string _name = string.Empty;
+        private string _urlPrefix = string.Empty;
+        private bool _acceptUrlParams = false;
         private HtmlGizmo Html = null;
 
-        public SillyView()
+        public SillyView(bool acceptUrlParams = false)
         {
             ContentType = SillyContentType.Html;
             Content = string.Empty;
+            _acceptUrlParams = acceptUrlParams;
+        }
+
+        public SillyView(string name, bool acceptUrlParams = false)
+            : this(acceptUrlParams)
+        {
+            _name = name;
+        }
+
+        public SillyView(string name, string urlPrefix, bool acceptUrlParams = false)
+            : this(name, acceptUrlParams)
+        {
+            _urlPrefix = urlPrefix;
         }
 
         public void Load(StreamReader data)
@@ -91,6 +123,40 @@ namespace SillyWidgets
             return(view);
         }
 
+        public async Task<Document> DynamoGetItemAsync(Amazon.RegionEndpoint endpoint, string table, string hashKey)
+        {
+            AmazonDynamoDBClient client = new AmazonDynamoDBClient(endpoint); 
+            Table dbTable = Table.LoadTable(client, table);
+            Document result = await dbTable.GetItemAsync(hashKey);
+            
+            return(result);
+        }
+
+        public async Task<Document> DynamoGetItemAsync(Amazon.RegionEndpoint endpoint, string table, Primitive hashKey, Primitive rangeKey)
+        {
+            AmazonDynamoDBClient client = new AmazonDynamoDBClient(endpoint); 
+            Table dbTable = Table.LoadTable(client, table);
+            Document result = await dbTable.GetItemAsync(hashKey, rangeKey);
+            
+            return(result);
+        }
+
+        public async Task<List<Document>> DynamoGetItemsAsync(Amazon.RegionEndpoint endpoint, string table, List<Primitive> hashKeys)
+        {
+            AmazonDynamoDBClient client = new AmazonDynamoDBClient(endpoint); 
+            Table dbTable = Table.LoadTable(client, table);
+            DocumentBatchGet batchDocument = dbTable.CreateBatchGet();
+            
+            foreach(Primitive hashKey in hashKeys)
+            {
+                batchDocument.AddKey(hashKey);
+            }
+
+            await batchDocument.ExecuteAsync();
+            
+            return(batchDocument.Results);
+        }
+
         public void Bind(string key, string text)
         {
             BindVals[key] = new SillyTextAttribute(key, new TextNode(text));
@@ -135,6 +201,11 @@ namespace SillyWidgets
             }
 
             return(loaded);
+        }
+
+        public virtual string Render(ISillyContext context, string[] urlParams)
+        {
+            return(string.Empty);
         }
 
         public string Render()
