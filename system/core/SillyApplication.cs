@@ -54,7 +54,7 @@ namespace SillyWidgets
             return(wasMapped);
         }
 
-        public virtual string Render(ISillyContext context)
+        public virtual ISillyView Dispatch(ISillyContext context)
         {
             if (context == null)
             {
@@ -82,12 +82,9 @@ namespace SillyWidgets
 
             if (pathSegments.Length == 0)
             {
-                if (Root.View == null)
-                {
-                    throw new SillyException(SillyHttpStatusCode.NotFound, "The path cannot be found: no home view");
-                }                
+                TryAcceptView(Root.View, context, new string[] {}, path);
 
-                return(Root.View.Render(context, new string[] {}));
+                return (Root.View);
             }
 
             SillySegment current = Root;
@@ -101,25 +98,39 @@ namespace SillyWidgets
                 {
                     current = next;
                 }
-                else if (current.View != null &&
-                         current.View.AcceptsUrlParameters)
-                {
-                    ArraySegment<string> urlParams = new ArraySegment<string>(pathSegments, i, pathSegments.Length - i);
-                    
-                    return(current.View.Render(context, urlParams.Array));
-                }
                 else
                 {
-                    throw new SillyException(SillyHttpStatusCode.NotFound, "The path cannot be found: " + path);
+                    ArraySegment<string> urlParams = new ArraySegment<string>(pathSegments, i, pathSegments.Length - i);
+
+                    TryAcceptView(current.View, context, urlParams.Array, path);
+
+                    return(current.View);
                 }
             }
 
-            if (current.View == null)
+            TryAcceptView(current.View, context, new string[] {}, path);
+
+            return(current.View);
+        }
+
+        private void TryAcceptView(ISillyView view, ISillyContext context, string[] urlParams, string path)
+        {
+            if (view == null)
             {
                 throw new SillyException(SillyHttpStatusCode.NotFound, "The path cannot be found: " + path);
-            }
+            }         
 
-            return(current.View.Render(context, new string[] {}));
+            if (!view.AcceptsUrlParameters && urlParams.Length > 0)
+            {
+                throw new SillyException(SillyHttpStatusCode.NotFound, "The path cannot be found: " + path);
+            }       
+
+            bool accepted = view.Accept(context, urlParams);
+
+            if (!accepted)
+            {
+                throw new SillyException(SillyHttpStatusCode.NotFound, "The path cannot be found: path " + path + " rejected");
+            }
         }
     }
 }

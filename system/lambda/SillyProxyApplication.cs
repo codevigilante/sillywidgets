@@ -53,10 +53,15 @@ namespace SillyWidgets
                 HttpMethod = StringToHttpMethod(input.httpMethod);
                 Path = input.path;               
 
-                string body = Render(this);
+                ISillyView view = base.Dispatch(this);
+
+                if (view == null)
+                {
+                    throw new SillyException(SillyHttpStatusCode.NotFound, "The path cannot be found: " + Path);
+                }
 
                 SillyProxyResponse response = new SillyProxyResponse();
-                response.body = body;
+                response.body = view.Render();
 
                 return(response);
             }

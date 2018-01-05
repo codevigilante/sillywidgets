@@ -27,9 +27,9 @@ namespace system.test
 
         }
 
-        public override string Render(ISillyContext context, string[] urlParams)
+        public override bool Accept(ISillyContext context, string[] urlParams)
         {
-            return("Home");
+            return(true);
         }
     }
 
@@ -46,9 +46,9 @@ namespace system.test
 
         }
 
-        public override string Render(ISillyContext context, string[] urlParams)
+        public override bool Accept(ISillyContext context, string[] urlParams)
         {
-            return("Blog");
+            return(true);
         }
     }
 
@@ -66,9 +66,9 @@ namespace system.test
 
         }
 
-        public override string Render(ISillyContext context, string[] urlParams)
+        public override bool Accept(ISillyContext context, string[] urlParams)
         {
-            return("Admin");
+            return(true);
         }
     }
 
@@ -83,50 +83,57 @@ namespace system.test
         public void MapViewTest()
         {
             Map(new Home()); // /home
-            Dispatch("/home", "home");
+            Dispatch("/home", typeof(Home));
             Map(new Blog()); // /blog
-            Dispatch("/blog", "blog");
+            Dispatch("/blog", typeof(Blog));
             Map(new Admin()); // /admin
-            Dispatch("/admin", "admin");
+            Dispatch("/admin", typeof(Admin));
             Map(new Home("seg1")); // /seg1
-            Dispatch("/seg1", "home");
+            Dispatch("/seg1", typeof(Home));
             Map(new Blog("seg2")); // /seg2
-            Dispatch("/seg2", "blog");
+            Dispatch("/seg2", typeof(Blog));
             Map(new Admin("seg3")); // /seg3
-            Dispatch("/seg3", "admin");
+            Dispatch("/seg3", typeof(Admin));
             Map(new Home(), true);
-            Dispatch("/penis", "home", true);
+            Dispatch("/penis", typeof(Home), true);
             Map(new Home("", "/folder")); // /folder/home
-            Dispatch("/folder/home", "home");
+            Dispatch("/folder/home", typeof(Home));
             Map(new Blog("", "/folder")); // /folder/blog
-            Dispatch("/folder/blog", "blog");
+            Dispatch("/folder/blog", typeof(Blog));
             Map(new Admin("", true, "/folder/taco/anus")); // /folder/taco/anus/admin/{var}/{var2}
-            Dispatch("/folder/taco/anus/admin", "admin");
-            Dispatch("/folder/taco/anus/admin/10/sex", "admin");
-            Dispatch("/folder/taco/anus/45/62", "admin", true);
+            Dispatch("/folder/taco/anus/admin", typeof(Admin));
+            Dispatch("/folder/taco/anus/admin/10/sex", typeof(Admin));
+            Dispatch("/folder/taco/anus/45/62", typeof(Admin), true);
             Map(new Home("", "/folder"), true);
-            Dispatch("/folder/taco/anus/home", "home", true);
+            Dispatch("/folder/taco/anus/home", typeof(Home), true);
             Map(new Blog("", "/home")); // /home/blog
-            Dispatch("/home/blog", "blog");
-            Dispatch("/home", "home");
+            Dispatch("/home/blog", typeof(Blog));
+            Dispatch("/home", typeof(Home));
         }
 
         [Fact]
         public void DispatchHomeTest()
         {
-            Dispatch("/", "home");
+            Dispatch("/", typeof(Home));
         }
 
-        private void Dispatch(string path, string content, bool shouldFail = false)
+        private void Dispatch(string path, Type viewType, bool shouldFail = false)
         {
             Console.Write("Dispatch " + path + "...");
             HttpMethod = SupportedHttpMethods.Get;
             Path = path;
             try
             {
-                string body = Render(this);
-                Console.WriteLine(body);
-                Assert.True(String.Compare(body, content, true) == 0);
+                ISillyView view = base.Dispatch(this);
+
+                if (view == null)
+                {
+                    throw new SillyException(SillyHttpStatusCode.BadRequest, "View was null");
+                }
+
+                Assert.True(view != null);
+                Assert.True(viewType == view.GetType());
+                Console.WriteLine(view.GetType());
             }
             catch(SillyException sillyEx)
             {

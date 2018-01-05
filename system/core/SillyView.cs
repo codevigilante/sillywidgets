@@ -11,7 +11,7 @@ using Amazon.DynamoDBv2.DocumentModel;
 
 namespace SillyWidgets
 {
-    public class SillyView : ISillyView
+    public abstract class SillyView : ISillyView
     {
         public SillyContentType ContentType { get; set; }
 
@@ -54,6 +54,8 @@ namespace SillyWidgets
         private string _urlPrefix = string.Empty;
         private bool _acceptUrlParams = false;
         private HtmlGizmo Html = null;
+
+        public abstract bool Accept(ISillyContext context, string[] urlParams);
 
         public SillyView(bool acceptUrlParams = false)
         {
@@ -98,7 +100,7 @@ namespace SillyWidgets
             return(true);
         }
 
-        public SillyView Load(string filepath)
+        public bool Load(string filepath)
         {
             if (filepath == null ||
                 filepath.Length == 0)
@@ -111,16 +113,14 @@ namespace SillyWidgets
                 throw new SillyException(SillyHttpStatusCode.NotFound, "View file '" + filepath + "' does not exist");
             }
 
-            SillyView view = null;
             FileStream fileStream = new FileStream(filepath, FileMode.Open);
 
             using (StreamReader reader = new StreamReader(fileStream))
             {
-                view = new SillyView();
-                view.Load(reader);
+                Load(reader);
             }
 
-            return(view);
+            return(true);
         }
 
         public async Task<Document> DynamoGetItemAsync(Amazon.RegionEndpoint endpoint, string table, string hashKey)
@@ -185,7 +185,7 @@ namespace SillyWidgets
             BindVals[key] =  new SillyWidgetAttribute(key, view.Html.Root);
         }
 
-        public async Task<bool> BindAsync(string key, string bucket, string bucketKey, Amazon.RegionEndpoint endpoint)
+        /*public async Task<bool> BindAsync(string key, string bucket, string bucketKey, Amazon.RegionEndpoint endpoint)
         {
             SillyView s3View = new SillyView();
 
@@ -201,14 +201,9 @@ namespace SillyWidgets
             }
 
             return(loaded);
-        }
+        }*/
 
-        public virtual string Render(ISillyContext context, string[] urlParams)
-        {
-            return(string.Empty);
-        }
-
-        public string Render()
+        public virtual string Render()
         {
             if (Html == null)
             {

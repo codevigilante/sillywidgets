@@ -14,7 +14,8 @@ namespace SillyWidgets
         string UrlPrefix { get; }
         bool AcceptsUrlParameters { get; }
 
-        string Render(ISillyContext context, string[] urlParams);    
+        string Render(); 
+        bool Accept(ISillyContext context, string[] urlParams);   
     }
 
     /*public class SillyUrlParam : Tuple<string, bool>
