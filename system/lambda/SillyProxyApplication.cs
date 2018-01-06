@@ -18,8 +18,8 @@ namespace SillyWidgets
         public SillyProxyRequest OriginalRequest { get; private set; }
         public SupportedHttpMethods HttpMethod { get; set; }
 
-        public SillyProxyApplication(ISillyView homeView = null)
-            : base(homeView)
+        public SillyProxyApplication(ISillyPage homePage = null)
+            : base(homePage)
         {
             Path = string.Empty;
             OriginalRequest = null;
@@ -53,15 +53,15 @@ namespace SillyWidgets
                 HttpMethod = StringToHttpMethod(input.httpMethod);
                 Path = input.path;               
 
-                ISillyView view = base.Dispatch(this);
+                ISillyPage page = base.Dispatch(this);
 
-                if (view == null)
+                if (page == null)
                 {
                     throw new SillyException(SillyHttpStatusCode.NotFound, "The path cannot be found: " + Path);
                 }
 
                 SillyProxyResponse response = new SillyProxyResponse();
-                response.body = view.Render();
+                response.body = page.Render();
 
                 return(response);
             }

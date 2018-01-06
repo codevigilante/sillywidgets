@@ -7,27 +7,27 @@ namespace SillyWidgets
     {
         private SillySegment Root = null;
 
-        public SillyApplication(ISillyView homeView = null)
+        public SillyApplication(ISillyPage homePage = null)
         {  
-            Root = new SillySegment("/", homeView);
+            Root = new SillySegment("/", homePage);
         }
 
-        protected bool MapView(ISillyView view)
+        protected bool MapView(ISillyPage page)
         {
-            if (view == null)
+            if (page == null)
             {
                 return(false);
             }
 
-            string segment = view.Name;
+            string segment = page.Name;
             
             if (String.IsNullOrEmpty(segment) ||
                 String.IsNullOrWhiteSpace(segment))
             {
-                segment = view.GetType().Name;
+                segment = page.GetType().Name;
             }  
 
-            string[] prefixSegments = view.UrlPrefix.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] prefixSegments = page.UrlPrefix.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             SillySegment current = Root;
 
             foreach(string prefix in prefixSegments)
@@ -47,14 +47,14 @@ namespace SillyWidgets
                 }
             }
 
-            SillySegment viewSegment = new SillySegment(segment, view);
+            SillySegment pageSegment = new SillySegment(segment, page);
 
-            bool wasMapped = current.AddChild(viewSegment);
+            bool wasMapped = current.AddChild(pageSegment);
 
             return(wasMapped);
         }
 
-        public virtual ISillyView Dispatch(ISillyContext context)
+        public virtual ISillyPage Dispatch(ISillyContext context)
         {
             if (context == null)
             {
@@ -82,9 +82,9 @@ namespace SillyWidgets
 
             if (pathSegments.Length == 0)
             {
-                TryAcceptView(Root.View, context, new string[] {}, path);
+                TryAcceptView(Root.Page, context, new string[] {}, path);
 
-                return (Root.View);
+                return (Root.Page);
             }
 
             SillySegment current = Root;
@@ -102,30 +102,30 @@ namespace SillyWidgets
                 {
                     ArraySegment<string> urlParams = new ArraySegment<string>(pathSegments, i, pathSegments.Length - i);
 
-                    TryAcceptView(current.View, context, urlParams.Array, path);
+                    TryAcceptView(current.Page, context, urlParams.Array, path);
 
-                    return(current.View);
+                    return(current.Page);
                 }
             }
 
-            TryAcceptView(current.View, context, new string[] {}, path);
+            TryAcceptView(current.Page, context, new string[] {}, path);
 
-            return(current.View);
+            return(current.Page);
         }
 
-        private void TryAcceptView(ISillyView view, ISillyContext context, string[] urlParams, string path)
+        private void TryAcceptView(ISillyPage page, ISillyContext context, string[] urlParams, string path)
         {
-            if (view == null)
+            if (page == null)
             {
                 throw new SillyException(SillyHttpStatusCode.NotFound, "The path cannot be found: " + path);
             }         
 
-            if (!view.AcceptsUrlParameters && urlParams.Length > 0)
+            if (!page.AcceptsUrlParameters && urlParams.Length > 0)
             {
                 throw new SillyException(SillyHttpStatusCode.NotFound, "The path cannot be found: " + path);
             }       
 
-            bool accepted = view.Accept(context, urlParams);
+            bool accepted = page.Accept(context, urlParams);
 
             if (!accepted)
             {

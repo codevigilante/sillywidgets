@@ -9,11 +9,8 @@ namespace SillyDiagnostic
     public class SillyWidgetsDiagnostic : SillyProxyApplication
     {
         public SillyWidgetsDiagnostic()
-            : base()
+            : base(new Home())
         {
-            base.RegisterController("diagnostic", new Diagnostic());
-
-            GET("root", "/", "diagnostic", "Index");
         }
 
         public override SillyProxyResponse Handle(SillyProxyRequest input, ILambdaContext lambdaContext)

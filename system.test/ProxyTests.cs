@@ -14,9 +14,10 @@ namespace system.test
     // /folder/home
     // /folder/blog
     // /folder/taco/anus/admin
-    public class Home : SillyView
+    public class Home : SillyPage
     {
         public Home()
+            : base()
         {
 
         }
@@ -33,9 +34,10 @@ namespace system.test
         }
     }
 
-    public class Blog : SillyView
+    public class Blog : SillyPage
     {
         public Blog()
+            : base()
         {
 
         }
@@ -52,7 +54,7 @@ namespace system.test
         }
     }
 
-    public class Admin : SillyView
+    public class Admin : SillyPage
     {
         public Admin(bool acceptParams = false)
             : base(acceptParams)
@@ -124,16 +126,16 @@ namespace system.test
             Path = path;
             try
             {
-                ISillyView view = base.Dispatch(this);
+                ISillyPage page = base.Dispatch(this);
 
-                if (view == null)
+                if (page == null)
                 {
                     throw new SillyException(SillyHttpStatusCode.BadRequest, "View was null");
                 }
 
-                Assert.True(view != null);
-                Assert.True(viewType == view.GetType());
-                Console.WriteLine(view.GetType());
+                Assert.True(page != null);
+                Assert.True(viewType == page.GetType());
+                Console.WriteLine(page.GetType());
             }
             catch(SillyException sillyEx)
             {
@@ -150,10 +152,10 @@ namespace system.test
             }
         }
 
-        private void Map(SillyView view, bool isNeg = false)
+        private void Map(SillyPage page, bool isNeg = false)
         {
-            Console.Write("Map " + view.GetType().Name + "...");
-            bool ok = base.MapView(view);
+            Console.Write("Map " + page.GetType().Name + "...");
+            bool ok = base.MapView(page);
             Console.WriteLine(ok);
             Assert.True(isNeg ? !ok : ok);
         }

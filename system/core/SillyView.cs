@@ -1,8 +1,8 @@
 using System;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
+using System.Text;
 using SillyWidgets.Gizmos;
 using Amazon.S3;
 using Amazon.S3.Model;
@@ -11,69 +11,14 @@ using Amazon.DynamoDBv2.DocumentModel;
 
 namespace SillyWidgets
 {
-    public abstract class SillyView : ISillyView
+    public class SillyView
     {
-        public SillyContentType ContentType { get; set; }
-
         private Dictionary<string, SillyAttribute> BindVals = new Dictionary<string, SillyAttribute>();
+        protected HtmlGizmo Html = null;
 
-        public string Content
-        { 
-            get
-            {
-                if (String.IsNullOrEmpty(_content))
-                {
-                    return(Render());
-                }
-
-                return(_content);
-            } 
-            set
-            {
-                _content = value;
-            }
-        }
-
-        public string Name
+        public SillyView()
         {
-            get { return(_name); }
-        }
 
-        public string UrlPrefix
-        {
-            get { return(_urlPrefix); }
-        }
-
-        public bool AcceptsUrlParameters
-        {
-            get { return(_acceptUrlParams); }
-        }
-
-        private string _content = string.Empty;
-        private string _name = string.Empty;
-        private string _urlPrefix = string.Empty;
-        private bool _acceptUrlParams = false;
-        private HtmlGizmo Html = null;
-
-        public abstract bool Accept(ISillyContext context, string[] urlParams);
-
-        public SillyView(bool acceptUrlParams = false)
-        {
-            ContentType = SillyContentType.Html;
-            Content = string.Empty;
-            _acceptUrlParams = acceptUrlParams;
-        }
-
-        public SillyView(string name, bool acceptUrlParams = false)
-            : this(acceptUrlParams)
-        {
-            _name = name;
-        }
-
-        public SillyView(string name, string urlPrefix, bool acceptUrlParams = false)
-            : this(name, acceptUrlParams)
-        {
-            _urlPrefix = urlPrefix;
         }
 
         public void Load(StreamReader data)
@@ -185,6 +130,21 @@ namespace SillyWidgets
             BindVals[key] =  new SillyWidgetAttribute(key, view.Html.Root);
         }
 
+        public virtual string Render()
+        {
+            if (Html == null)
+            {
+                return(string.Empty);
+            }
+
+            HtmlPayloadVisitor payloadCreator = new HtmlPayloadVisitor(BindVals);
+
+            Html.ExecuteHtmlVisitor(payloadCreator);
+            string content = payloadCreator.Payload.ToString();
+            
+            return(content);
+        }
+
         /*public async Task<bool> BindAsync(string key, string bucket, string bucketKey, Amazon.RegionEndpoint endpoint)
         {
             SillyView s3View = new SillyView();
@@ -202,22 +162,6 @@ namespace SillyWidgets
 
             return(loaded);
         }*/
-
-        public virtual string Render()
-        {
-            if (Html == null)
-            {
-                return(_content);
-            }
-
-            HtmlPayloadVisitor payloadCreator = new HtmlPayloadVisitor(BindVals);
-
-            Html.ExecuteHtmlVisitor(payloadCreator);
-            _content = payloadCreator.Payload.ToString();
-            
-            return(_content);
-        }
-
     }
 
     internal class HtmlPayloadVisitor : IVisitor

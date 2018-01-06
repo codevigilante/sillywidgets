@@ -6,17 +6,17 @@ namespace SillyWidgets
 {
     public class SillySegment
     {
-        public ISillyView View { get; set; }
+        public ISillyPage Page { get; set; }
         public string SegmentID { get; private set; }
         public SillySegment Parent { get; private set; }
 
         private Dictionary<string, SillySegment> Children = new Dictionary<string, SillySegment>();
 
-        public SillySegment(string segmentID, ISillyView view = null)
+        public SillySegment(string segmentID, ISillyPage page = null)
         {
             SegmentID = segmentID.ToLower();
             Parent = null;
-            View = view;
+            Page = page;
         }
 
         public bool AddChild(SillySegment child)
