@@ -11,9 +11,10 @@ using Amazon.DynamoDBv2.DocumentModel;
 
 namespace SillyWidgets
 {
-    public class SillyView
+    public class SillyView : ISillyWidget
     {
         private Dictionary<string, SillyAttribute> BindVals = new Dictionary<string, SillyAttribute>();
+
         protected HtmlGizmo Html = null;
 
         public SillyView()
@@ -104,30 +105,29 @@ namespace SillyWidgets
 
         public void Bind(string key, string text)
         {
-            BindVals[key] = new SillyTextAttribute(key, new TextNode(text));
+            ISillyWidget widget = new SillyTextWidget(text);
+
+            Bind(key, widget);
         }
 
         public void Bind(Document dynamoItem)
         {
             foreach(KeyValuePair<string, DynamoDBEntry> entry in dynamoItem)
             {
-                BindVals[entry.Key] = new SillyTextAttribute(entry.Key, new TextNode(entry.Value.AsString()));
+                Bind(entry.Key, new SillyTextWidget(entry.Value.AsString()));
             }
         }
 
-        public void Bind(string key, SillyView view)
-        {
-            if (view == null ||
-                view.Html == null)
+        public void Bind(string key, ISillyWidget widget)
+        {            
+            if (widget == null)
             {
-                TextNode errorNode = new TextNode("Error binding " + key + ": no view or HTML to bind");
-
-                BindVals[key] = new SillyTextAttribute(key, errorNode);
+                Bind(key, "Error binding " + key + ": no view or HTML to bind");
 
                 return;
             }
 
-            BindVals[key] =  new SillyWidgetAttribute(key, view.Html.Root);
+            BindVals[key] = new SillyAttribute(key, SillyAttribute.SillyAttrType.Widget, widget);
         }
 
         public virtual string Render()
@@ -216,6 +216,8 @@ namespace SillyWidgets
             Payload.Append("<");
             Payload.Append(node.Name);
 
+            ISillyWidget widget = null;
+
             if (node.Attributes.Count > 0)
             {
                 foreach(KeyValuePair<string, string> attr in node.Attributes)
@@ -230,16 +232,13 @@ namespace SillyWidgets
                             {
                                 node.DeleteChildren();
 
-                                if (boundAttr.BoundValues().Count == 0)
+                                if (boundAttr.Widget == null)
                                 {
                                     node.AddChild(new TextNode("Error rendering " + attr.Value + ": trying to bind null node"));
                                 }
                                 else
                                 {
-                                    foreach(TreeNodeGizmo childNode in boundAttr.BoundValues())
-                                    {
-                                        node.AddChild(childNode);
-                                    }
+                                    widget = boundAttr.Widget;
                                 }                     
 
                                 continue;
@@ -260,6 +259,11 @@ namespace SillyWidgets
             }
 
             Payload.Append(">");
+
+            if (widget != null)
+            {
+                Payload.Append(widget.Render());
+            }
         }
 
         public void VisitText(TextNode node)

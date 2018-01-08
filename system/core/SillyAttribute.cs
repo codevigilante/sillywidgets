@@ -9,16 +9,13 @@ namespace SillyWidgets
         public enum SillyAttrType { Text, Widget, Unsupported }
         public SillyAttrType Type { get; private set; }
         public string Name { get; private set; }
+        public virtual ISillyWidget Widget { get; set; }
 
-        public SillyAttribute(string name, SillyAttrType type)
+        public SillyAttribute(string name, SillyAttrType type, ISillyWidget widget = null)
         {            
             Type = type;
             Name = name;
-        }
-
-        public virtual List<TreeNodeGizmo> BoundValues()
-        {
-            return(new List<TreeNodeGizmo>());
+            Widget = widget;
         }
 
         public static bool IsSillyAttribute(string attr)
@@ -43,43 +40,6 @@ namespace SillyWidgets
             }
 
             return(false);
-        }
-    }
-
-    public class SillyTextAttribute : SillyAttribute
-    {
-        private TreeNodeGizmo Value = null;
-
-        public SillyTextAttribute(string name, TreeNodeGizmo value)
-            : base(name, SillyAttrType.Text)
-        {
-            Value = value;
-        }
-
-        public override List<TreeNodeGizmo> BoundValues()
-        {
-            return(new List<TreeNodeGizmo>() { Value });
-        }
-    }
-
-    public class SillyWidgetAttribute : SillyAttribute
-    {
-        private List<TreeNodeGizmo> HtmlNodes = null;
-
-        public SillyWidgetAttribute(string name, List<TreeNodeGizmo> htmlNodes)
-            : base(name, SillyAttrType.Widget)
-        {
-            HtmlNodes = htmlNodes;
-        }
-
-        public override List<TreeNodeGizmo> BoundValues()
-        {
-            if (HtmlNodes == null)
-            {
-                return(new List<TreeNodeGizmo>() { new TextNode(base.Name + ": no HTML to bind") });
-            }
-
-            return(HtmlNodes);
         }
     }
 }

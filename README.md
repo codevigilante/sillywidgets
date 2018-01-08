@@ -129,12 +129,12 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 # todo
 
 * v0.7 - Jan 2018
-* update diagnostic
 * bind lists and maps, and/or be able to loop over a collection in the view
 * should probably check Http response codes when doing AWS shit
 * figure out to resolve POST and GET
 * and start thinking about sessions and cookies and shit
 * vFUTURE
+* move dyanmo stuff to a base model class, and how to bind these models to views
 * improve loading from S3, dynamo
 * improve parsing HTML
 * implement markup inheritance, because it's hot

@@ -43,16 +43,17 @@ namespace SillyDiagnostic
             contentResult.Wait();
             contentTimer.Stop();
 
-            Bind(data.Result);
+            Bind(data.Result); // goes in the header
             Bind("content", content);
             Bind("header", header);
-            Bind("dynamoGetValue", dynamoTimer.Elapsed.TotalMilliseconds + "ms");
-            Bind("s3source", "diagnostic/diag.html");
-            Bind("loadViewValue", homeTimer.Elapsed.TotalMilliseconds + "ms");
-            Bind("s3header", "diagnostic/header.html");
-            Bind("loadHeaderValue", headerTimer.Elapsed.TotalMilliseconds + "ms");
-            Bind("s3content", "diagnostic/content.html");
-            Bind("loadContentValue", contentTimer.Elapsed.TotalMilliseconds + "ms");
+            content.Bind("dynamoGetValue", dynamoTimer.Elapsed.TotalMilliseconds + "ms");
+            content.Bind("s3source", "diagnostic/diag.html");
+            content.Bind("loadViewValue", homeTimer.Elapsed.TotalMilliseconds + "ms");
+            content.Bind("s3header", "diagnostic/header.html");
+            content.Bind("loadHeaderValue", headerTimer.Elapsed.TotalMilliseconds + "ms");
+            content.Bind("s3content", "diagnostic/content.html");
+            content.Bind("loadContentValue", contentTimer.Elapsed.TotalMilliseconds + "ms");
+            header.Bind(data.Result);
 
             return(true);
         }
