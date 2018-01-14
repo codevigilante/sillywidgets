@@ -1,4 +1,5 @@
 using System;
+using SillyWidgets.Gizmos;
 
 namespace SillyWidgets
 {
@@ -14,6 +15,11 @@ namespace SillyWidgets
         public string Render()
         {
             return(Text);
+        }
+
+        public bool Attach(TreeNodeGizmo node)
+        {
+            return(false);
         }
     }
 }

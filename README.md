@@ -129,6 +129,7 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 # todo
 
 * v0.7 - Jan 2018
+* build a test server for the diagnostic, and/or make the unit tests spin up the server
 * bind lists and maps, and/or be able to loop over a collection in the view
 * should probably check Http response codes when doing AWS shit
 * figure out to resolve POST and GET

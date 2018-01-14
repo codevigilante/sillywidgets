@@ -130,6 +130,11 @@ namespace SillyWidgets
             BindVals[key] = new SillyAttribute(key, SillyAttribute.SillyAttrType.Widget, widget);
         }
 
+        public virtual bool Attach(TreeNodeGizmo node)
+        {
+            return(true);
+        }
+
         public virtual string Render()
         {
             if (Html == null)
@@ -169,6 +174,7 @@ namespace SillyWidgets
         public StringBuilder Payload { get; private set; }
         private bool Exiting = false;
         private Dictionary<string, SillyAttribute> BindVals = null;
+        private bool RenderChildren = true;
 
         public HtmlPayloadVisitor(Dictionary<string, SillyAttribute> bindVals)
         {
@@ -186,13 +192,18 @@ namespace SillyWidgets
             Exiting = false;
             node.Accept(this);
 
-            foreach(TreeNodeGizmo child in node.GetChildren())
+            if (RenderChildren)
             {
-                Go(child);
-            }
+                foreach(TreeNodeGizmo child in node.GetChildren())
+                {
+                    Go(child);
+                }
+            }            
 
             Exiting = true;
             node.Accept(this);
+
+            RenderChildren = true;
         }
 
         public void VisitElement(ElementNode node)
@@ -230,11 +241,9 @@ namespace SillyWidgets
 
                             if (BindVals.TryGetValue(attr.Value, out boundAttr))
                             {
-                                node.DeleteChildren();
-
                                 if (boundAttr.Widget == null)
                                 {
-                                    node.AddChild(new TextNode("Error rendering " + attr.Value + ": trying to bind null node"));
+                                    widget = new SillyTextWidget("Error rendering " + attr.Value + ": trying to bind null node");
                                 }
                                 else
                                 {
@@ -262,6 +271,7 @@ namespace SillyWidgets
 
             if (widget != null)
             {
+                RenderChildren = widget.Attach(node);
                 Payload.Append(widget.Render());
             }
         }

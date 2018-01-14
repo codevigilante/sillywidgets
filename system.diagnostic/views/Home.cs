@@ -43,7 +43,24 @@ namespace SillyDiagnostic
             contentResult.Wait();
             contentTimer.Stop();
 
-            Bind(data.Result); // goes in the header
+            Stopwatch listTimer = new Stopwatch();
+            listTimer.Start();
+            SillyListWidget list = new SillyListWidget();
+            Bind("groceryList", list);
+
+            for(int i = 0; i < 1000; ++i)
+            {
+               SillyListItem item = new SillyListItem();
+               item.Bind("item", "Hello " + i);
+               
+               list.AddItem(item);
+            }
+            listTimer.Stop();
+            SillyListItem bindTime = new SillyListItem();
+            bindTime.Bind("item", "1000 item bind time: " + listTimer.Elapsed.TotalMilliseconds);
+            list.AddItem(bindTime);
+
+            Bind(data.Result);
             Bind("content", content);
             Bind("header", header);
             content.Bind("dynamoGetValue", dynamoTimer.Elapsed.TotalMilliseconds + "ms");
