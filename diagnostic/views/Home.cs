@@ -48,16 +48,17 @@ namespace SillyDiagnostic
             SillyListWidget list = new SillyListWidget();
             Bind("groceryList", list);
 
-            for(int i = 0; i < 1000; ++i)
+            for(int i = 0; i < 10; ++i)
             {
                SillyListItem item = new SillyListItem();
                item.Bind("item", "Hello " + i);
                
                list.AddItem(item);
             }
+
             listTimer.Stop();
             SillyListItem bindTime = new SillyListItem();
-            bindTime.Bind("item", "1000 item bind time: " + listTimer.Elapsed.TotalMilliseconds);
+            bindTime.Bind("item", "10 item bind time: " + listTimer.Elapsed.TotalMilliseconds + "ms");
             list.AddItem(bindTime);
 
             Bind(data.Result);

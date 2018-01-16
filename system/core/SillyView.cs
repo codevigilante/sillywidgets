@@ -11,11 +11,11 @@ using Amazon.DynamoDBv2.DocumentModel;
 
 namespace SillyWidgets
 {
-    public class SillyView : ISillyWidget
+    public class SillyView : HtmlGizmo, ISillyWidget
     {
         private Dictionary<string, SillyAttribute> BindVals = new Dictionary<string, SillyAttribute>();
 
-        protected HtmlGizmo Html = null;
+        //protected HtmlGizmo Html = null;
 
         public SillyView()
         {
@@ -24,12 +24,12 @@ namespace SillyWidgets
 
         public void Load(StreamReader data)
         {
-            Html = new HtmlGizmo();
-            bool success = Html.Load(data);
+            //Html = new HtmlGizmo();
+            bool success = base.Load(data);
 
             if (!success)
             {
-                throw new Exception("Parsing HTML: " + Html.ParseError);
+                throw new Exception("Parsing HTML: " + base.ParseError);
             }
         }
 
@@ -132,41 +132,24 @@ namespace SillyWidgets
 
         public virtual bool Attach(TreeNodeGizmo node)
         {
-            return(true);
+            return(false);
         }
 
         public virtual string Render()
         {
-            if (Html == null)
+            if (Root == null ||
+                Root.Count == 0)
             {
                 return(string.Empty);
             }
 
             HtmlPayloadVisitor payloadCreator = new HtmlPayloadVisitor(BindVals);
 
-            Html.ExecuteHtmlVisitor(payloadCreator);
+            base.ExecuteHtmlVisitor(payloadCreator);
             string content = payloadCreator.Payload.ToString();
             
             return(content);
         }
-
-        /*public async Task<bool> BindAsync(string key, string bucket, string bucketKey, Amazon.RegionEndpoint endpoint)
-        {
-            SillyView s3View = new SillyView();
-
-            bool loaded = await s3View.LoadS3Async(bucket, bucketKey, endpoint);
-
-            if (loaded)
-            {
-                Bind(key, s3View);
-            }
-            else
-            {
-                Bind(key, "Silly view not found: " + key);
-            }
-
-            return(loaded);
-        }*/
     }
 
     internal class HtmlPayloadVisitor : IVisitor

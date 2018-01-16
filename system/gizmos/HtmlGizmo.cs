@@ -8,7 +8,7 @@ namespace SillyWidgets.Gizmos
     public class HtmlGizmo
     {
         public string ParseError { get; private set; }
-        public List<TreeNodeGizmo> Root
+        public virtual List<TreeNodeGizmo> Root
         {
             get
             {
@@ -67,23 +67,19 @@ namespace SillyWidgets.Gizmos
 
         public void ExecuteHtmlVisitor(IVisitor visitor)
         {
-            if (DocRoot == null || visitor == null)
+            if (Root == null || visitor == null)
             {
                 return;
             }
 
-            if (DocRoot.GetChildren().Count > 0)
+            foreach(TreeNodeGizmo child in Root)
             {
-                foreach(TreeNodeGizmo child in DocRoot.GetChildren())
-                {
-                    visitor.Go(child);
-                }
+                visitor.Go(child);
             }
         }
 
         private void ProcessToken(Token token)
         {
-            //Console.WriteLine(token.Type + ":" + token.Value);
             StateMachine.Accept(token);
         }
     }
