@@ -1,5 +1,5 @@
 using System;
-using System.Dynamic;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace SillyWidgets
@@ -9,14 +9,33 @@ namespace SillyWidgets
         public string resource { get; set; }
         public string path { get; set; }
         public string httpMethod { get; set; }
-        public dynamic queryStringParameters { get; set; }
-        public dynamic headers { get; set; }
-        public string body { get; set; } // this needs to be parsed for POST vars
+        public Dictionary<string, object> queryStringParameters { get; set; }
+        public Dictionary<string, object> headers { get; set; }
+        public string body { get; set; }
 
         public SillyProxyRequest()
         {
-            queryStringParameters = new ExpandoObject();
-            headers = new ExpandoObject();
+            queryStringParameters = new Dictionary<string, object>();
+            headers = new Dictionary<string, object>();
+        }
+
+        public override string ToString()
+        {
+            string queryVars = string.Empty;
+
+            foreach(KeyValuePair<string, object> param in queryStringParameters)
+            {
+                queryVars += param.Key + "=" + param.Value.ToString();
+            }
+
+            string header = string.Empty;
+
+            foreach(KeyValuePair<string, object> param in headers)
+            {
+                header += param.Key + "=" + param.Value;
+            }
+
+            return("-----> M:" + httpMethod + " P:" + path + " Q:" + queryVars + " B:" + body + " END----->");
         }
     }
 }

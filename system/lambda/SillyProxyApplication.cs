@@ -26,9 +26,17 @@ namespace SillyWidgets
             HttpMethod = SupportedHttpMethods.Unsupported;
         }
 
-        public object GET(string name)
+        public bool GET(string name, out object value)
         {
-            return(null);
+            value = null;
+
+            if (OriginalRequest == null ||
+                OriginalRequest.queryStringParameters.Count == 0)
+            {
+                return(false);
+            }           
+
+            return(OriginalRequest.queryStringParameters.TryGetValue(name, out value));
         }
 
         public object POST(string name)

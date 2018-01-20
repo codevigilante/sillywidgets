@@ -52,8 +52,6 @@ namespace SillyWidgets
 
         public override string Render()
         {
-            Console.WriteLine("Render list..." + Items.Count);
-
             if (Items.Count == 0)
             {
                 return(string.Empty);

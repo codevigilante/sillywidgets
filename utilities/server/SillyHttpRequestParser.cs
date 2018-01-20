@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Net.Http.Headers;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -8,7 +9,7 @@ namespace SillyWidgets.Utilities.Server
     public class SillyHttpRequestParser : SillyProxyRequest
     {
         public enum Methods { GET, POST }
-        public enum Headers { Host, Connection, CacheControl, UpgradeInsecureRequests, UserAgent, Accept, AcceptEncoding, AcceptLanguage, Unknown }
+        public enum Headers { Host, Connection, CacheControl, UpgradeInsecureRequests, UserAgent, Accept, AcceptEncoding, AcceptLanguage, ContentType, ContentLength, Unknown }
         public Methods Method { get; private set; }
         public string URL { get; private set; }
         public string Version { get; private set; }
@@ -17,7 +18,6 @@ namespace SillyWidgets.Utilities.Server
         public bool RequestIsFile { get; private set; }
         public bool Ignore { get; private set; }
 
-        private string[] RequestLines = null;
         private Dictionary<string, Methods> SupportedMethods = new Dictionary<string, Methods>()
         {
             { "GET", Methods.GET },
@@ -34,10 +34,23 @@ namespace SillyWidgets.Utilities.Server
             { Headers.Host, "" },
             { Headers.Unknown, "" },
             { Headers.UpgradeInsecureRequests, "" },
-            { Headers.UserAgent, "" }
+            { Headers.UserAgent, "" },
+            { Headers.ContentType, "" },
+            { Headers.ContentLength, "" }
         };
 
+        public SillyHttpRequestParser()
+            : base()
+        {
+        }
+
         public SillyHttpRequestParser(string request)
+            : this()
+        {
+            Parse(request);
+        }
+
+        public void Parse(string request)
         {
             if (String.IsNullOrEmpty(request) || String.IsNullOrWhiteSpace(request))
             {
@@ -49,21 +62,43 @@ namespace SillyWidgets.Utilities.Server
             Ignore = false;
             IsInvalid = false;
             RequestIsFile = false;
-            RequestLines = request.Split(new char[] { '\n', '\r' }, 2, StringSplitOptions.RemoveEmptyEntries);
 
-            if (RequestLines.Length > 1)
-            {
-                ParseRequest();   
-                ParseHeader();
-            }
-            else if (RequestLines.Length == 0)
+            string[] requestParts = Regex.Split(request, @"(\r\n\r\n)");
+
+            if (requestParts.Length == 0)
             {
                 Ignore = true;
-            }
-            else
+
+                return;
+            } 
+
+            StringBuilder body = new StringBuilder();
+
+            for(int i = 0; i < requestParts.Length; ++i)
             {
-                SetInvalid("Request is incomplete");
-            }
+                string part = requestParts[i].Trim();
+
+                if (i == 0)
+                {
+                    ParseHeader(part);
+
+                    continue;
+                }
+
+                if (String.IsNullOrEmpty(part) &&
+                    i == 1)
+                {
+                    // skip the blank line between the header and the body
+                    continue;
+                }
+
+                body.Append(part);
+            } 
+
+            if (body.Length > 0)
+            {
+                base.body = body.ToString();
+            }        
         }
 
         public string GetHeader(Headers param)
@@ -97,9 +132,9 @@ namespace SillyWidgets.Utilities.Server
             return(str);
         }
 
-        private void ParseRequest()
+        private void ParseRequest(string requestLine)
         {
-            string[] requestParts = RequestLines[0].Split(' ');
+            string[] requestParts = requestLine.Split(' ');
 
             if (requestParts.Length >= 3)
             {
@@ -116,7 +151,6 @@ namespace SillyWidgets.Utilities.Server
                 }
 
                 URL = requestParts[1];
-
                 Version = requestParts[2];
 
                 WhatIsURL();
@@ -128,22 +162,43 @@ namespace SillyWidgets.Utilities.Server
             }            
         }
 
-        private void ParseHeader()
+        private void ParseHeader(string header)
         {
+            string[] headerLines = header.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (headerLines.Length == 0)
+            {
+                SetInvalid("Header appears to be empty");
+
+                return;
+            }
+
             Regex headerName = new Regex(@"^(.*?:)");
             Regex headerValue = new Regex(@"(:\s.*)");
             IDictionary<string, object> proxyHeaders = base.headers;
 
-            foreach(string line in RequestLines)
+            for (int i = 0; i < headerLines.Length; ++i)
             {
+                string line = headerLines[i];
+
+                if (i == 0)
+                {
+                    ParseRequest(line);
+
+                    continue;
+                }
+
                 Match match = headerName.Match(line);
                 string name = match.Value.Trim(':');
 
                 match = headerValue.Match(line);
                 string value = match.Value.Trim(new char[] { ':', ' ' });
-                
-                HeaderData[StringToHeaderName(name)] = value;
-                proxyHeaders[name] = value;
+
+                if (!String.IsNullOrEmpty(name))
+                {
+                    HeaderData[StringToHeaderName(name)] = value;
+                    proxyHeaders[name] = value;
+                }
             }
         }
 
@@ -215,6 +270,10 @@ namespace SillyWidgets.Utilities.Server
                     return(Headers.AcceptEncoding);
                 case "accept-language":
                     return(Headers.AcceptLanguage);
+                case "content-type":
+                    return(Headers.ContentType);
+                case "content-length":
+                    return(Headers.ContentLength);
                 default:
                     return(Headers.Unknown);
             }

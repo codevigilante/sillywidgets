@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Text;
 using SillyWidgets.Gizmos;
 using Amazon.S3;
+using Amazon.S3.Util;
 using Amazon.S3.Model;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;

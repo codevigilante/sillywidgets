@@ -6,7 +6,7 @@ namespace SillyWidgets
 
     public interface ISillyContext
     {
-        object GET(string name);
+        bool GET(string name, out object value);
         object POST(string name);
         string Path { get; }
         SupportedHttpMethods HttpMethod { get; }
