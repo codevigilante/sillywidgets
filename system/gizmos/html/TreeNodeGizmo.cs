@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SillyWidgets.Gizmos
 {
-    public interface IVisitor
+    public interface ITreeNodeVisitor
     {
         void VisitElement(ElementNode node);
         void VisitText(TextNode node);
@@ -26,7 +26,7 @@ namespace SillyWidgets.Gizmos
         }
 
         public abstract List<TreeNodeGizmo> GetChildren();
-        public abstract void Accept(IVisitor visitor);
+        public abstract void Accept(ITreeNodeVisitor visitor);
         public abstract void Print(string indent, bool last);
         //public abstract string 
     }
@@ -42,7 +42,7 @@ namespace SillyWidgets.Gizmos
             Attributes = new Dictionary<string, string>();
         }
 
-        public override void Accept(IVisitor visitor)
+        public override void Accept(ITreeNodeVisitor visitor)
         {
             visitor.VisitElement(this);
         }
@@ -126,7 +126,7 @@ namespace SillyWidgets.Gizmos
             return (new List<TreeNodeGizmo>());
         }
 
-        public override void Accept(IVisitor visitor)
+        public override void Accept(ITreeNodeVisitor visitor)
         {
             visitor.VisitText(this);
         }

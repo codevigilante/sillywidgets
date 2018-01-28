@@ -65,7 +65,7 @@ namespace SillyWidgets.Gizmos
             return(ok);
         }
 
-        public void ExecuteHtmlVisitor(IVisitor visitor)
+        public void ExecuteHtmlVisitor(ITreeNodeVisitor visitor)
         {
             if (Root == null || visitor == null)
             {

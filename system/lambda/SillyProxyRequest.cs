@@ -32,7 +32,7 @@ namespace SillyWidgets
 
             foreach(KeyValuePair<string, object> param in headers)
             {
-                header += param.Key + "=" + param.Value;
+                header += param.Key + "=" + param.Value.ToString();
             }
 
             return("-----> M:" + httpMethod + " P:" + path + " Q:" + queryVars + " B:" + body + " END----->");

@@ -7,6 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Amazon.Lambda.Core;
 using Amazon;
+using SillyWidgets.Gizmos;
 
 [assembly: LambdaSerializerAttribute(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -17,6 +18,8 @@ namespace SillyWidgets
         public string Path { get; set; }
         public SillyProxyRequest OriginalRequest { get; private set; }
         public SupportedHttpMethods HttpMethod { get; set; }
+
+        private Dictionary<string, object> Post = new Dictionary<string, object>();
 
         public SillyProxyApplication(ISillyPage homePage = null)
             : base(homePage)
@@ -31,6 +34,7 @@ namespace SillyWidgets
             value = null;
 
             if (OriginalRequest == null ||
+                OriginalRequest.queryStringParameters == null ||
                 OriginalRequest.queryStringParameters.Count == 0)
             {
                 return(false);
@@ -39,13 +43,38 @@ namespace SillyWidgets
             return(OriginalRequest.queryStringParameters.TryGetValue(name, out value));
         }
 
-        public object POST(string name)
+        public bool POST(string name, out object value)
         {
-            return(null);
+            value = null;
+
+            return(Post.TryGetValue(name, out value));
+        }
+
+        public bool HEADER(string name, out string value)
+        {
+            value = string.Empty;
+
+            if (OriginalRequest == null ||
+                OriginalRequest.headers == null ||
+                OriginalRequest.headers.Count == 0)
+            {
+                return(false);
+            }
+
+            object val = null;
+
+            if (OriginalRequest.headers.TryGetValue(name, out val))
+            {
+                value = val.ToString();
+
+                return(true);
+            }
+
+            return(false);
         }
 
         //********************************************************************
-        // Lambda signature: aws-netcore-serverless-hello-world::AWSNetCore.<MyLambdaHandlerDerivedClass>::Handle
+        // Lambda signature: <assembly>::<namespace>.<MyProxyDerivedClass>::<method>
         //********************************************************************
         [Amazon.Lambda.Core.LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
         public virtual SillyProxyResponse Handle(SillyProxyRequest input, ILambdaContext lambdaContext)
@@ -57,9 +86,7 @@ namespace SillyWidgets
                     throw new SillyException(SillyHttpStatusCode.ServerError, "Request aborted upon delivery.");
                 }
 
-                OriginalRequest = input;
-                HttpMethod = StringToHttpMethod(input.httpMethod);
-                Path = input.path;               
+                DoStuffWithRequest(input);     
 
                 ISillyPage page = base.Dispatch(this);
 
@@ -81,6 +108,39 @@ namespace SillyWidgets
             {
                 return(buildErrorResponse(SillyHttpStatusCode.ServerError, Ex.Message + "\n" + Ex.StackTrace));
             }
+        }
+
+        private void DoStuffWithRequest(SillyProxyRequest request)
+        {
+            OriginalRequest = request;
+            HttpMethod = StringToHttpMethod(request.httpMethod);
+            Path = request.path;   
+
+            if (!String.IsNullOrEmpty(request.body) && HttpMethod == SupportedHttpMethods.Post)
+            {
+                string decodedBody = WebUtilityGizmo.UrlDecode(request.body);
+                string[] nameValuePairs = decodedBody.Split(new char[] { '&' }, StringSplitOptions.RemoveEmptyEntries);
+
+                foreach(string nameValue in nameValuePairs)
+                {
+                    string[] divided = nameValue.Split(new char[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    if (divided.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    string name = divided[0];
+                    string value = string.Empty;
+
+                    if (divided.Length == 2)
+                    {
+                        value = divided[1];
+                    }
+
+                    Post[name] = value;
+                }
+            }       
         }
 
         private SupportedHttpMethods StringToHttpMethod(string httpMethod)

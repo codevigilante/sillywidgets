@@ -1,6 +1,9 @@
 using Xunit;
 using System;
+using System.Collections.Generic;
 using SillyWidgets;
+using SillyWidgets.Gizmos;
+using System.Diagnostics;
 
 namespace system.test
 {
@@ -82,8 +85,39 @@ namespace system.test
         }
 
         [Fact]
+        public void UrlDecodeTests()
+        {
+            Console.WriteLine("--- URL Decode Tests ---");
+
+            Dictionary<string, string> EncodedToDecoded = new Dictionary<string, string>()
+            {
+                { @"Hello%20Gunter%20%2B%20%7B%7D%20is%20a%20whore%5B%5D", @"Hello Gunter + {} is a whore[]" },
+                { @"Hello++++++Gunter+is%5fit%5fme", @"Hello      Gunter is_it_me"},
+                { @"Hamburger%20made%20a%20%2C%20peromi0oi3n%20234oj%2054325%204g5%20v%20oi4h5v%204hv5gl%3B324m%20q3'5gm", @"Hamburger made a , peromi0oi3n 234oj 54325 4g5 v oi4h5v 4hv5gl;324m q3'5gm" },
+                { @"~!%40%23%24%25%5E%26*()_%2B%7D%7C%7B%22%3A%3F%3E%3Cmnb%20SDF%20WETRB%20W4B%20W45G%20W45G%20124%601234%2F.%2C%2F.%2C%3BSKLDFOJKNB4T", "~!@#$%^&*()_+}|{\":?><mnb SDF WETRB W4B W45G W45G 124`1234/.,/.,;SKLDFOJKNB4T"}
+            };
+
+            int iterations = 100000;
+            Stopwatch decodeTime = new Stopwatch();
+            decodeTime.Start();
+            for(int i = 0; i < iterations; ++i)
+            {
+                foreach(KeyValuePair<string, string> str in EncodedToDecoded)
+                {
+                    string val = WebUtilityGizmo.UrlDecode(str.Key);
+
+                    Assert.Equal<string>(str.Value, val);
+                }
+            }
+            decodeTime.Stop();
+            Console.WriteLine("Decode time (" + iterations + "): " + decodeTime.Elapsed.TotalMilliseconds + "ms");
+        }
+
+        [Fact]
         public void MapViewTest()
         {
+            Console.WriteLine("--- MapView Tests ---");
+
             Map(new Home()); // /home
             Dispatch("/home", typeof(Home));
             Map(new Blog()); // /blog
@@ -116,6 +150,8 @@ namespace system.test
         [Fact]
         public void DispatchHomeTest()
         {
+            Console.WriteLine("--- DispatchHome Tests ---");
+
             Dispatch("/", typeof(Home));
         }
 

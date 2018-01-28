@@ -11,6 +11,7 @@ namespace SillyWidgets
         public static string TextHtml = "text/html";
         public static string TextCss = "text/css";
         public static string ApplicationJavascript = "application/javascript";
+        public static string ApplicationXWWWFormUrlEncoded = "application/x-www-form-urlencoded";
     }
 
     public class SillyProxyResponse

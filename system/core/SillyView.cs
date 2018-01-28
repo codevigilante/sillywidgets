@@ -153,12 +153,13 @@ namespace SillyWidgets
         }
     }
 
-    internal class HtmlPayloadVisitor : IVisitor
+    internal class HtmlPayloadVisitor : ITreeNodeVisitor
     {
         public StringBuilder Payload { get; private set; }
         private bool Exiting = false;
         private Dictionary<string, SillyAttribute> BindVals = null;
         private bool RenderChildren = true;
+        private bool ForceCloseTag = false;
 
         public HtmlPayloadVisitor(Dictionary<string, SillyAttribute> bindVals)
         {
@@ -188,21 +189,22 @@ namespace SillyWidgets
             node.Accept(this);
 
             RenderChildren = true;
+            ForceCloseTag = false;
         }
 
         public void VisitElement(ElementNode node)
         {
             if (Exiting)
             {
-                if (node.SelfCloseTag)
-                {
-                    Payload.Append(" />");
-                }
-                else if (node.HasCloseTag)
+                if (ForceCloseTag || node.HasCloseTag)
                 {
                     Payload.Append("</");
                     Payload.Append(node.Name);
                     Payload.Append(">");
+                }
+                else if (node.SelfCloseTag)
+                {
+                    Payload.Append(" />");
                 }
 
                 return;
@@ -251,12 +253,16 @@ namespace SillyWidgets
                 }
             }
 
-            Payload.Append(">");
-
             if (widget != null)
             {
                 RenderChildren = widget.Attach(node);
+                Payload.Append(">");
                 Payload.Append(widget.Render());
+                ForceCloseTag = true;
+            }
+            else if (!node.SelfCloseTag)
+            {
+                Payload.Append(">");
             }
         }
 

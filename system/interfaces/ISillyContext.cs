@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace SillyWidgets
 {
@@ -7,8 +8,9 @@ namespace SillyWidgets
     public interface ISillyContext
     {
         bool GET(string name, out object value);
-        object POST(string name);
+        bool POST(string name, out object value);
         string Path { get; }
         SupportedHttpMethods HttpMethod { get; }
+        bool HEADER(string name, out string value);
     }
 }

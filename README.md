@@ -129,10 +129,15 @@ These directions are extremely general and vague, but Amazon has pretty good doc
 # todo
 
 * v0.7 - Jan 2018
-* figure out to resolve POST
-* and start thinking about sessions and cookies and shit
+* BUG: self close tags render like `<tag> />`
+* how to populate attributes, especially inside forms, with silly variables
+    * should we have a SillyForm widget?
+* and start thinking about sessions and cookies and shit (Cognito?)
+* also, redirects
 * vFUTURE
 * move dyanmo stuff to a base model class, and how to bind these models to views
+* make SillyApplication more generic, like for handling requests from any HTTP server
+* support unicode chars in url decode
 * improve loading from S3, dynamo
 * improve parsing HTML
 * implement markup inheritance, because it's hot

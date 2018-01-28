@@ -6,13 +6,13 @@
     </head>
     <body>
         <div silly:widget="header" class="header">{header}</div>
-        <div silly:widget="content" class="content"></div>
+        <div silly:widget="content" class="content" />
         <ul silly:list="groceryList">
             <li silly:text="item">{grocery item}</li>
         </ul>
         <form method="POST" action="/">
-            <input type="text" name="user" placeholder="user"></input>
-            <input type="submit" name="btn" value="submit"></input>
+            <input type="text" name="user" placeholder="user" />
+            <input type="submit" name="btn" value="submit" />
         </form>
         <div class="footer">
             <p>Contact: <span silly:text="email">{email}</span></p>
