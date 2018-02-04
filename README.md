@@ -124,17 +124,27 @@ Upload your zip file. The Handler name will be `<assembly(.dll)::namespace.class
 
 Setup and API Gateway as a proxy and point it at your Lambda function
 
-These directions are extremely general and vague, but Amazon has pretty good docs to help you through permissions and security and DNS all that crap 
+These directions are extremely general and vague, but Amazon has pretty good docs to help you through permissions and security and DNS all that crap.
+
+# Silly Markup
+
+* **silly:text** => `<span silly:text="text">Hello</span>` Replaces everything between tags with text contained in SillyTextWidget
+* **silly:widget** => `<silly:widget name="widget" />` Declared in same markup file that can be used as a widget. Designed to save S3 lookups
+* **silly:widget** => `<div silly:widget="widget" class="container" />` Chunk of HTML defined somewhere else (will be appended as child of this element)
+* **silly:list** => `<ul silly:list="list"><li silly:text="item">Item</li></ul>` Repeater that repeats all child elements. Can be used on any tag with child elements
+* **silly:attr** => `<input name="whatever" silly:attr="attr1;attr2;attr3">` Adds `attr1` value to element. If attribute already exists, it's duplicated
+* silly:head => '<silly:head>things to stick in the head section of containing HTML</silly:head>` Used in widget HTML to contribute to HTML head section
+* silly:form => `<form method="POST" silly:form="form">form things</form>` Dynamically build forms and do other form stuff
 
 # todo
 
 * v0.7 - Jan 2018
-* BUG: self close tags render like `<tag> />`
-* how to populate attributes, especially inside forms, with silly variables
-    * should we have a SillyForm widget?
+* implement `silly:widget` and `silly:attr`
 * and start thinking about sessions and cookies and shit (Cognito?)
 * also, redirects
 * vFUTURE
+* make Lambda handler async, or just offer an async version and let the user decide which to use
+* is there any improvements to make, optimizing as much as possible for Lambda?
 * move dyanmo stuff to a base model class, and how to bind these models to views
 * make SillyApplication more generic, like for handling requests from any HTTP server
 * support unicode chars in url decode

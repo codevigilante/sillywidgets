@@ -1,22 +1,30 @@
-<html silly:view="diagnostic">
+<html silly:page="diagnostic">
     <head>
         <title>Silly Widgets Diagnostic</title>
         <link href="https://fonts.googleapis.com/css?family=Rubik|Marcellus" rel="stylesheet">
         <link rel="stylesheet" type="text/css" href="https://s3-us-west-1.amazonaws.com/sillywidgets.com/diagnostic/style.css">
     </head>
     <body>
-        <div silly:widget="header" class="header">{header}</div>
+        <div silly:widget="header" class="header" />
         <div silly:widget="content" class="content" />
+        
         <ul silly:list="groceryList">
             <li silly:text="item">{grocery item}</li>
         </ul>
+
         <form method="POST" action="/">
             <input type="text" name="user" placeholder="user" />
             <input type="submit" name="btn" value="submit" />
         </form>
+
         <div class="footer">
             <p>Contact: <span silly:text="email">{email}</span></p>
             <p>Don't forget: <span silly:text="herotitle">{hero title}</span></p>
         </div>        
     </body>
 </html>
+<!--
+<silly:widget name="fragment">
+    <h1>Hello, I'm a fragment</h1>
+</silly:widget>
+-->

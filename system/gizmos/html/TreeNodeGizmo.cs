@@ -4,31 +4,25 @@ using System.Text;
 
 namespace SillyWidgets.Gizmos
 {
-    public interface ITreeNodeVisitor
-    {
-        void VisitElement(ElementNode node);
-        void VisitText(TextNode node);
-        void Go(TreeNodeGizmo node);
-    }
-
     public abstract class TreeNodeGizmo
     {
         public TreeNodeGizmo Parent { get; set; }
         public string Name { get; set; }
         public bool HasCloseTag { get; set; }
         public bool SelfCloseTag { get; set; }
+        public bool Visited { get; set; }
 
         public TreeNodeGizmo(string name)
         {
             Name = name;
             Parent = null;
+            Visited = false;
             HasCloseTag = SelfCloseTag = false;
         }
 
         public abstract List<TreeNodeGizmo> GetChildren();
         public abstract void Accept(ITreeNodeVisitor visitor);
         public abstract void Print(string indent, bool last);
-        //public abstract string 
     }
 
     public class ElementNode : TreeNodeGizmo
@@ -76,16 +70,6 @@ namespace SillyWidgets.Gizmos
 
             return(val);
         }
-
-        /*public override string ToHtmlElement()
-        {
-            StringBuilder builder = new StringBuilder();
-            builder.Append("<");
-            builder.Append(Name);
-            builder.Append(">");
-
-            return("<" + Name + ">");
-        }*/
 
         public override void Print(string indent, bool last)
         {

@@ -1,6 +1,7 @@
 using Xunit;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using SillyWidgets;
 using SillyWidgets.Gizmos;
 using System.Diagnostics;
@@ -153,6 +154,54 @@ namespace system.test
             Console.WriteLine("--- DispatchHome Tests ---");
 
             Dispatch("/", typeof(Home));
+        }
+
+        [Fact]
+        public void ValidHtmlTests()
+        {
+            Console.WriteLine("--- ValidHTML Tests ---");
+
+            HtmlGizmo html = new HtmlGizmo();
+
+            Stream fileStream = new FileStream("testdata/simple.html", FileMode.Open);
+
+            using (StreamReader reader = new StreamReader(fileStream))
+            {
+                Console.Write("Parsing simple.html 100 times...");
+                Stopwatch timer = new Stopwatch();
+                timer.Start();
+                for(int i = 0; i < 100; ++i)
+                {
+                    timer.Stop();
+                    fileStream.Seek(0, SeekOrigin.Begin);
+                    reader.DiscardBufferedData();
+                    timer.Start();
+                    bool success = html.Load(reader);
+                    Assert.True(success);
+                    string htmlData = html.ToHtml();
+                    Assert.False(String.IsNullOrEmpty(htmlData));                    
+                }
+                timer.Stop();
+
+                Console.WriteLine(timer.ElapsedMilliseconds + "ms " + timer.ElapsedMilliseconds / 100 + "ms avg.");                
+            }
+
+            fileStream = new FileStream("testdata/google.html", FileMode.Open);
+
+            using (StreamReader reader = new StreamReader(fileStream))
+            {
+                Console.Write("Parsing google.html...");
+                Stopwatch timer = new Stopwatch();
+                timer.Start();
+                bool success = html.Load(reader);
+                timer.Stop();
+
+                Console.WriteLine("Parse time: " + timer.ElapsedMilliseconds + "ms");
+
+                Assert.True(success);
+            }
+
+            Console.WriteLine();
         }
 
         private void Dispatch(string path, Type viewType, bool shouldFail = false)

@@ -24,6 +24,7 @@ namespace SillyWidgets.Gizmos
         private HtmlLexerGizmo Lexer = null;
         private HtmlStateMachineGizmo StateMachine = null;
         private ElementNode DocRoot = null;
+        private HtmlAssembleVisitor ToHtmlVisitor = null;
 
         public HtmlGizmo()
         {
@@ -63,6 +64,23 @@ namespace SillyWidgets.Gizmos
             DocRoot = StateMachine.TreeBuilder.Root;
 
             return(ok);
+        }
+
+        public virtual string ToHtml()
+        {
+            if (Root == null || Root.Count == 0)
+            {
+                return(string.Empty);
+            }
+
+            if (ToHtmlVisitor == null)
+            {
+                ToHtmlVisitor = new HtmlAssembleVisitor();
+            }
+
+            ExecuteHtmlVisitor(ToHtmlVisitor);            
+
+            return(ToHtmlVisitor.Get());
         }
 
         public void ExecuteHtmlVisitor(ITreeNodeVisitor visitor)

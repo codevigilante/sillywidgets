@@ -24,11 +24,12 @@ namespace SillyWidgets.Gizmos
         };
         private HtmlState Current = null;
 
-        public HtmlTreeBuilder TreeBuilder = new HtmlTreeBuilder();
+        public HtmlTreeBuilder TreeBuilder { get; private set; }
 
-        public HtmlStateMachineGizmo()
+        public HtmlStateMachineGizmo(HtmlTreeBuilder treeBuilder = null)
         {
             Current = StateLookup[States.Begin];
+            TreeBuilder = treeBuilder == null ? new HtmlTreeBuilder() : treeBuilder;
         }
 
         public void Transition(States toState, Token token)

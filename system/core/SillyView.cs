@@ -16,16 +16,12 @@ namespace SillyWidgets
     {
         private Dictionary<string, SillyAttribute> BindVals = new Dictionary<string, SillyAttribute>();
 
-        //protected HtmlGizmo Html = null;
-
         public SillyView()
         {
-
         }
 
         public void Load(StreamReader data)
         {
-            //Html = new HtmlGizmo();
             bool success = base.Load(data);
 
             if (!success)
@@ -144,136 +140,12 @@ namespace SillyWidgets
                 return(string.Empty);
             }
 
-            HtmlPayloadVisitor payloadCreator = new HtmlPayloadVisitor(BindVals);
+            SillyHtmlVisitor payloadCreator = new SillyHtmlVisitor(BindVals);
 
             base.ExecuteHtmlVisitor(payloadCreator);
             string content = payloadCreator.Payload.ToString();
             
             return(content);
-        }
-    }
-
-    internal class HtmlPayloadVisitor : ITreeNodeVisitor
-    {
-        public StringBuilder Payload { get; private set; }
-        private bool Exiting = false;
-        private Dictionary<string, SillyAttribute> BindVals = null;
-        private bool RenderChildren = true;
-        private bool ForceCloseTag = false;
-
-        public HtmlPayloadVisitor(Dictionary<string, SillyAttribute> bindVals)
-        {
-            Payload = new StringBuilder();
-            BindVals = bindVals;
-        }
-
-        public void Go(TreeNodeGizmo node)
-        {
-            if (node == null)
-            {
-                return;
-            }
-
-            Exiting = false;
-            node.Accept(this);
-
-            if (RenderChildren)
-            {
-                foreach(TreeNodeGizmo child in node.GetChildren())
-                {
-                    Go(child);
-                }
-            }            
-
-            Exiting = true;
-            node.Accept(this);
-
-            RenderChildren = true;
-            ForceCloseTag = false;
-        }
-
-        public void VisitElement(ElementNode node)
-        {
-            if (Exiting)
-            {
-                if (ForceCloseTag || node.HasCloseTag)
-                {
-                    Payload.Append("</");
-                    Payload.Append(node.Name);
-                    Payload.Append(">");
-                }
-                else if (node.SelfCloseTag)
-                {
-                    Payload.Append(" />");
-                }
-
-                return;
-            }
-
-            Payload.Append("<");
-            Payload.Append(node.Name);
-
-            ISillyWidget widget = null;
-
-            if (node.Attributes.Count > 0)
-            {
-                foreach(KeyValuePair<string, string> attr in node.Attributes)
-                {
-                    if (BindVals != null)
-                    {
-                        if (SillyAttribute.IsSillyAttribute(attr.Key))
-                        {
-                            SillyAttribute boundAttr = null;
-
-                            if (BindVals.TryGetValue(attr.Value, out boundAttr))
-                            {
-                                if (boundAttr.Widget == null)
-                                {
-                                    widget = new SillyTextWidget("Error rendering " + attr.Value + ": trying to bind null node");
-                                }
-                                else
-                                {
-                                    widget = boundAttr.Widget;
-                                }                     
-
-                                continue;
-                            }
-                        }
-                    }
-
-                    Payload.Append(" ");
-                    Payload.Append(attr.Key);
-                    
-                    if (!String.IsNullOrEmpty(attr.Value))
-                    {
-                        Payload.Append("=\"");
-                        Payload.Append(attr.Value);
-                        Payload.Append("\"");
-                    }
-                }
-            }
-
-            if (widget != null)
-            {
-                RenderChildren = widget.Attach(node);
-                Payload.Append(">");
-                Payload.Append(widget.Render());
-                ForceCloseTag = true;
-            }
-            else if (!node.SelfCloseTag)
-            {
-                Payload.Append(">");
-            }
-        }
-
-        public void VisitText(TextNode node)
-        {
-            if (Exiting)
-            {
-                return;
-            }
-
-            Payload.Append(node.Text);
         }
     }
 }

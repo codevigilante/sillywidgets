@@ -12,8 +12,6 @@ namespace SillyWidgets
             Root = new SillySegment("/", homePage);
         }
 
-        // public ISillyResponse DealWithRequest(ISillyRequest request)
-
         protected bool MapView(ISillyPage page)
         {
             if (page == null)
